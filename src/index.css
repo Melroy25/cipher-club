@@ -7,11 +7,61 @@
     background-color: #030804;
     color: #e2fbe8;
     font-family: 'Space Grotesk', sans-serif;
-    cursor: none; /* Custom cursor */
   }
 
-  a, button, input, textarea {
+  /* Custom cursor only on public website */
+  body:not(.admin-mode):not(:has(.admin-app)) {
+    cursor: none;
+  }
+
+  body:not(.admin-mode):not(:has(.admin-app)) a,
+  body:not(.admin-mode):not(:has(.admin-app)) button,
+  body:not(.admin-mode):not(:has(.admin-app)) input,
+  body:not(.admin-mode):not(:has(.admin-app)) textarea {
     cursor: none !important;
+  }
+
+  /* Standard visible cursor in Admin CMS */
+  body.admin-mode,
+  body.admin-mode *,
+  body:has(.admin-app),
+  body:has(.admin-app) *,
+  .admin-app,
+  .admin-app * {
+    cursor: auto !important;
+  }
+
+  body.admin-mode a,
+  body.admin-mode button,
+  body.admin-mode [role="button"],
+  body.admin-mode select,
+  body.admin-mode label,
+  body:has(.admin-app) a,
+  body:has(.admin-app) button,
+  body:has(.admin-app) [role="button"],
+  body:has(.admin-app) select,
+  body:has(.admin-app) label,
+  .admin-app a,
+  .admin-app button,
+  .admin-app [role="button"],
+  .admin-app select,
+  .admin-app label,
+  .admin-app .cursor-pointer {
+    cursor: pointer !important;
+  }
+
+  body.admin-mode input,
+  body.admin-mode textarea,
+  body:has(.admin-app) input,
+  body:has(.admin-app) textarea,
+  .admin-app input,
+  .admin-app textarea {
+    cursor: text !important;
+  }
+
+  body.admin-mode .cursor-not-allowed,
+  .admin-app .cursor-not-allowed {
+    cursor: not-allowed !important;
   }
 }
 

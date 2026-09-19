@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext.tsx";
 import { ToastProvider } from "./context/ToastContext.tsx";
@@ -36,33 +36,42 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 };
 
 export const AdminApp: React.FC = () => {
+  React.useEffect(() => {
+    document.body.classList.add("admin-mode");
+    return () => {
+      document.body.classList.remove("admin-mode");
+    };
+  }, []);
+
   return (
-    <ToastProvider>
-      <AuthProvider>
-        <Routes>
-          <Route path="login" element={<LoginPage />} />
+    <div className="admin-app min-h-screen bg-[#020703] text-[#e2fbe8]">
+      <ToastProvider>
+        <AuthProvider>
+          <Routes>
+            <Route path="login" element={<LoginPage />} />
 
-          <Route
-            element={
-              <ProtectedRoute>
-                <AdminLayout />
-              </ProtectedRoute>
-            }
-          >
-            <Route index element={<DashboardPage />} />
-            <Route path="members" element={<MembersPage />} />
-            <Route path="projects" element={<ProjectsPage />} />
-            <Route path="events" element={<EventsPage />} />
-            <Route path="activities" element={<ActivitiesPage />} />
-            <Route path="domains" element={<DomainsPage />} />
-            <Route path="content" element={<ContentPage />} />
-            <Route path="media" element={<MediaPage />} />
-            <Route path="settings" element={<SettingsPage />} />
-          </Route>
+            <Route
+              element={
+                <ProtectedRoute>
+                  <AdminLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<DashboardPage />} />
+              <Route path="members" element={<MembersPage />} />
+              <Route path="projects" element={<ProjectsPage />} />
+              <Route path="events" element={<EventsPage />} />
+              <Route path="activities" element={<ActivitiesPage />} />
+              <Route path="domains" element={<DomainsPage />} />
+              <Route path="content" element={<ContentPage />} />
+              <Route path="media" element={<MediaPage />} />
+              <Route path="settings" element={<SettingsPage />} />
+            </Route>
 
-          <Route path="*" element={<Navigate to="/admin" replace />} />
-        </Routes>
-      </AuthProvider>
-    </ToastProvider>
+            <Route path="*" element={<Navigate to="/admin" replace />} />
+          </Routes>
+        </AuthProvider>
+      </ToastProvider>
+    </div>
   );
 };

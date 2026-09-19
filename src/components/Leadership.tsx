@@ -1,10 +1,10 @@
-import React, { useState, useRef } from 'react';
+﻿import React, { useState, useRef, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { GithubIcon, LinkedinIcon } from './Icons.tsx';
 import { useScrambleText } from '../hooks/useScrambleText.ts';
 import { Leader, LeaderModal } from './LeaderModal.tsx';
 
-const LEADERS: Leader[] = [
+const DEFAULT_LEADERS: Leader[] = [
   {
     id: 'nazmin',
     name: 'Nazmin Ziya',
@@ -50,11 +50,38 @@ const LEADERS: Leader[] = [
 
 export const Leadership: React.FC = () => {
   const { displayText, ref } = useScrambleText("Leadership Structure");
+  const [leaders, setLeaders] = useState<Leader[]>(DEFAULT_LEADERS);
   const [selectedLeader, setSelectedLeader] = useState<Leader | null>(null);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    async function fetchLeaders() {
+      try {
+        const res = await fetch('/api/public/members');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+            const mapped: Leader[] = json.data.map((m: any) => ({
+              id: m.id,
+              name: m.name,
+              role: m.role,
+              image: m.photoUrl,
+              modalImage: m.modalPhotoUrl || m.photoUrl,
+              github: m.github || 'https://github.com',
+              linkedin: m.linkedin || 'https://linkedin.com',
+            }));
+            setLeaders(mapped);
+          }
+        }
+      } catch {
+        // Fall back to DEFAULT_LEADERS
+      }
+    }
+    fetchLeaders();
+  }, []);
+
   // Duplicating leaders array for an infinite-like scroll feel
-  const displayLeaders = [...LEADERS, ...LEADERS];
+  const displayLeaders = [...leaders, ...leaders];
 
   return (
     <section id="leadership" className="relative py-28 md:py-36 overflow-hidden">

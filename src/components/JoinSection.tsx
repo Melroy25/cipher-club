@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useScrambleText } from '../hooks/useScrambleText.ts';
 
 interface JoinSectionProps {
@@ -6,11 +6,30 @@ interface JoinSectionProps {
 }
 
 export const JoinSection: React.FC<JoinSectionProps> = ({ onOpenJoinModal }) => {
-  const { displayText, ref } = useScrambleText("Join the Team");
+  const [heading, setHeading] = useState("Join the Team");
+  const [text, setText] = useState(
+    "Whether you want to build, lead, or simply learn — CIPHER is where CSE students turn curiosity into capability. Join the community and help shape what comes next."
+  );
+
+  const { displayText, ref } = useScrambleText(heading);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  useEffect(() => {
+    async function fetchContent() {
+      try {
+        const res = await fetch('/api/public/content');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.map?.join_heading) setHeading(json.map.join_heading);
+          if (json.map?.join_text) setText(json.map.join_text);
+        }
+      } catch {}
+    }
+    fetchContent();
+  }, []);
 
   return (
     <section id="join" className="relative py-28 md:py-36 overflow-hidden">
@@ -28,7 +47,7 @@ export const JoinSection: React.FC<JoinSectionProps> = ({ onOpenJoinModal }) => 
         </h2>
 
         <p className="font-mono text-base sm:text-lg text-[#a0c0a8] leading-relaxed max-w-2xl mx-auto mb-10">
-          Whether you want to build, lead, or simply learn — CIPHER is where CSE students turn curiosity into capability. Join the community and help shape what comes next.
+          {text}
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-5">

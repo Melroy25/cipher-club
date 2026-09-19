@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
 import { useScrambleText } from '../hooks/useScrambleText.ts';
 import { EventData, EventModal } from './EventModal.tsx';
 
-const EVENTS_DATA: EventData[] = [
+const DEFAULT_EVENTS: EventData[] = [
   {
     id: 'lumiere',
     tag: 'BRANCH GALA',
@@ -59,7 +59,53 @@ const EVENTS_DATA: EventData[] = [
 
 export const Events: React.FC = () => {
   const { displayText, ref } = useScrambleText("Events & Workshops");
+  const [events, setEvents] = useState<EventData[]>(DEFAULT_EVENTS);
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
+
+  useEffect(() => {
+    async function fetchEvents() {
+      try {
+        const res = await fetch('/api/public/events');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+            const mapped: EventData[] = json.data.map((ev: any) => {
+              let fullDesc = [ev.shortDesc];
+              if (ev.fullDescription) {
+                try {
+                  const parsed = JSON.parse(ev.fullDescription);
+                  if (Array.isArray(parsed)) fullDesc = parsed;
+                } catch {
+                  fullDesc = ev.fullDescription.split('\n\n');
+                }
+              }
+
+              const slidesList = Array.isArray(ev.slides) && ev.slides.length > 0
+                ? ev.slides.map((s: any) => s.imageUrl)
+                : [];
+
+              return {
+                id: ev.id,
+                tag: ev.tag,
+                dateTag: ev.dateTag,
+                title: ev.title,
+                subTitle: ev.subTitle || `${ev.dateTag} · ${ev.venue || 'SJEC'}`,
+                slug: ev.slug || ev.title.replace(/\s+/g, '_').toUpperCase(),
+                cardSub: ev.cardSub || ev.category,
+                description: ev.shortDesc,
+                fullDescription: fullDesc,
+                slides: slidesList.length > 0 ? slidesList : ['/assets/logo.png'],
+              };
+            });
+            setEvents(mapped);
+          }
+        }
+      } catch {
+        // Fall back to DEFAULT_EVENTS
+      }
+    }
+    fetchEvents();
+  }, []);
 
   return (
     <section id="events" className="relative py-28 md:py-36 overflow-hidden">
@@ -77,9 +123,9 @@ export const Events: React.FC = () => {
           </h2>
         </div>
 
-        {/* 2 Event Cards */}
+        {/* Event Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {EVENTS_DATA.map((event) => (
+          {events.map((event) => (
             <div
               key={event.id}
               onClick={() => setSelectedEvent(event)}

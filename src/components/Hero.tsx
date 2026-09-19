@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 
 interface HeroProps {
   onOpenJoinModal: () => void;
@@ -36,6 +36,11 @@ const RANDOM_CHARS = "@#%*+=:;.-+CRIPHE10_";
 
 export const Hero: React.FC<HeroProps> = ({ onOpenJoinModal, onOpenRootAccess }) => {
   const [shimmerLines, setShimmerLines] = useState<string[]>(ASCII_CIPHER_TEMPLATE);
+  const [subtitle, setSubtitle] = useState(
+    "Bridging academic knowledge and practical application – a community of aspiring professionals in computing."
+  );
+  const [joinBtnText, setJoinBtnText] = useState("JOIN CIPHER");
+  const [eventsBtnText, setEventsBtnText] = useState("EXPLORE EVENTS");
 
   // Periodic ASCII matrix shimmer
   useEffect(() => {
@@ -59,6 +64,23 @@ export const Hero: React.FC<HeroProps> = ({ onOpenJoinModal, onOpenRootAccess })
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    async function fetchContent() {
+      try {
+        const res = await fetch('/api/public/content');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.map) {
+            if (json.map.hero_subtitle) setSubtitle(json.map.hero_subtitle);
+            if (json.map.hero_join_btn) setJoinBtnText(json.map.hero_join_btn);
+            if (json.map.hero_events_btn) setEventsBtnText(json.map.hero_events_btn);
+          }
+        }
+      } catch {}
+    }
+    fetchContent();
+  }, []);
+
   return (
     <section id="home" className="relative min-h-screen pt-32 pb-20 flex flex-col justify-center overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-12 w-full relative z-10">
@@ -77,17 +99,17 @@ export const Hero: React.FC<HeroProps> = ({ onOpenJoinModal, onOpenRootAccess })
             <span
               onClick={onOpenRootAccess}
               data-cursor="search"
-              className="inline-block text-[#00ff66] hover:text-glow-lg transition-all duration-300 relative group select-none"
+              className="inline-block text-[#00ff66] hover:text-glow-lg transition-all duration-300 relative group select-none cursor-pointer"
               title="Click for backdoor access"
             >
-              &
+              &amp;
               <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#00ff66]/0 group-hover:bg-[#00ff66] transition-colors" />
             </span>{' '}
             Engineering
           </h1>
 
           <p className="mt-6 text-base sm:text-lg md:text-xl font-mono text-[#a0c0a8] leading-relaxed max-w-2xl">
-            Bridging academic knowledge and practical application – a community of aspiring professionals in computing.
+            {subtitle}
           </p>
 
           {/* Action Buttons */}
@@ -96,14 +118,14 @@ export const Hero: React.FC<HeroProps> = ({ onOpenJoinModal, onOpenRootAccess })
               onClick={onOpenJoinModal}
               className="bg-[#00ff66] hover:bg-[#00e65b] text-[#030804] font-mono font-bold text-sm tracking-widest px-7 py-3.5 rounded-lg transition-all duration-300 shadow-[0_0_20px_rgba(0,255,102,0.5)] hover:shadow-[0_0_30px_rgba(0,255,102,0.8)] hover:scale-[1.02] flex items-center gap-2"
             >
-              JOIN CIPHER <span className="text-base font-sans">&rarr;</span>
+              {joinBtnText} <span className="text-base font-sans">&rarr;</span>
             </button>
 
             <a
               href="#events"
               className="border border-[#00ff66] text-[#00ff66] hover:bg-[#00ff66]/10 font-mono text-sm tracking-widest px-7 py-3.5 rounded-lg transition-all duration-300 hover:shadow-[0_0_15px_rgba(0,255,102,0.3)] hover:scale-[1.02]"
             >
-              EXPLORE EVENTS
+              {eventsBtnText}
             </a>
           </div>
         </div>

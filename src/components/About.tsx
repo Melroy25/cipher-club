@@ -1,8 +1,26 @@
-import React from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useScrambleText } from '../hooks/useScrambleText.ts';
 
 export const About: React.FC = () => {
   const { displayText, ref } = useScrambleText("Who we are");
+  const [aboutText, setAboutText] = useState(
+    "CIPHER is the student association of the Department of Computer Science & Engineering. It serves as a platform for students to nurture their technical and interpersonal skills through innovative and collaborative activities. The association strives to bridge the gap between academic knowledge and practical application, fostering a community of aspiring professionals dedicated to excellence in computing."
+  );
+
+  useEffect(() => {
+    async function fetchContent() {
+      try {
+        const res = await fetch('/api/public/content');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.map?.about_text) {
+            setAboutText(json.map.about_text);
+          }
+        }
+      } catch {}
+    }
+    fetchContent();
+  }, []);
 
   return (
     <section id="about" className="relative py-28 md:py-36 overflow-hidden">
@@ -24,7 +42,7 @@ export const About: React.FC = () => {
             </h2>
 
             <p className="font-mono text-base sm:text-lg text-[#a0c0a8] leading-relaxed max-w-xl">
-              <span className="text-[#00ff66] font-semibold">CIPHER</span> is the student association of the Department of Computer Science &amp; Engineering. It serves as a platform for students to nurture their technical and interpersonal skills through innovative and collaborative activities. The association strives to bridge the gap between academic knowledge and practical application, fostering a community of aspiring professionals dedicated to excellence in computing.
+              {aboutText}
             </p>
           </div>
 

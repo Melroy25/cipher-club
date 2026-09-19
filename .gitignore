@@ -1,4 +1,4 @@
-# Logs
+﻿# Logs
 logs
 *.log
 npm-debug.log*
@@ -11,6 +11,11 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+server/.env
+server/dist
+server/node_modules
+server/public/uploads
 
 # Editor directories and files
 .vscode/*
@@ -31,3 +36,5 @@ detail_crops
 extracted_assets
 sheet_*.jpg
 temp_sec_*.jpg
+
+.vercel

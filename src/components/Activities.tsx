@@ -1,8 +1,13 @@
-import React from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { ArrowUpRight } from 'lucide-react';
 import { useScrambleText } from '../hooks/useScrambleText.ts';
 
-const ACTIVITIES_LIST = [
+interface ActivityItem {
+  id: string;
+  title: string;
+}
+
+const DEFAULT_ACTIVITIES_LIST: ActivityItem[] = [
   { id: '01', title: 'Applied Machine Learning' },
   { id: '02', title: 'Industrial Visit' },
   { id: '03', title: 'LaTeX Tool' },
@@ -24,6 +29,40 @@ const ACTIVITIES_LIST = [
 
 export const Activities: React.FC = () => {
   const { displayText, ref } = useScrambleText("Activities");
+  const [activities, setActivities] = useState<ActivityItem[]>(DEFAULT_ACTIVITIES_LIST);
+  const [introDesc, setIntroDesc] = useState(
+    "Hands-on workshops, industrial visits, and technical sessions run by the Cipher Association — spanning AI, blockchain, research tooling, and career prep."
+  );
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await fetch('/api/public/activities');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+            const mapped: ActivityItem[] = json.data.map((a: any, idx: number) => ({
+              id: a.numberId || String(idx + 1).padStart(2, '0'),
+              title: a.title,
+            }));
+            setActivities(mapped);
+          }
+        }
+      } catch {}
+
+      try {
+        const cRes = await fetch('/api/public/content');
+        if (cRes.ok) {
+          const cJson = await cRes.json();
+          if (cJson.map?.activities_desc) {
+            setIntroDesc(cJson.map.activities_desc);
+          }
+        }
+      } catch {}
+    }
+
+    fetchData();
+  }, []);
 
   return (
     <section id="archive" className="relative py-28 md:py-36 overflow-hidden">
@@ -40,13 +79,13 @@ export const Activities: React.FC = () => {
             {displayText}
           </h2>
           <p className="font-mono text-base text-[#a0c0a8] max-w-2xl leading-relaxed">
-            Hands-on workshops, industrial visits, and technical sessions run by the Cipher Association — spanning AI, blockchain, research tooling, and career prep.
+            {introDesc}
           </p>
         </div>
 
         {/* 3-Column Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
-          {ACTIVITIES_LIST.map((act) => (
+          {activities.map((act) => (
             <div
               key={act.id}
               className="clickable-card group relative rounded-xl px-5 py-4 bg-[#08170c]/70 backdrop-blur-md border border-[#00ff66]/15 hover:border-[#00ff66]/60 transition-all duration-200 hover:shadow-[0_0_18px_rgba(0,255,102,0.18)] hover:-translate-y-0.5 flex items-center justify-between"

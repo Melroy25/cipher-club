@@ -1,8 +1,26 @@
-import React from 'react';
-import { Code2, Crown, Users, Rocket } from 'lucide-react';
+﻿import React, { useState, useEffect } from 'react';
+import { Code2, Crown, Users, Rocket, Cpu, Terminal, Shield, Sparkles } from 'lucide-react';
 import { useScrambleText } from '../hooks/useScrambleText.ts';
 
-const DOMAIN_DATA = [
+const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
+  Code2,
+  Crown,
+  Users,
+  Rocket,
+  Cpu,
+  Terminal,
+  Shield,
+  Sparkles,
+};
+
+interface DomainItem {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  sessions: string;
+  description: string;
+}
+
+const DEFAULT_DOMAIN_DATA: DomainItem[] = [
   {
     icon: Code2,
     title: "Technical Skill Building",
@@ -31,6 +49,28 @@ const DOMAIN_DATA = [
 
 export const Domains: React.FC = () => {
   const { displayText, ref } = useScrambleText("Our Domains");
+  const [domains, setDomains] = useState<DomainItem[]>(DEFAULT_DOMAIN_DATA);
+
+  useEffect(() => {
+    async function fetchDomains() {
+      try {
+        const res = await fetch('/api/public/domains');
+        if (res.ok) {
+          const json = await res.json();
+          if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+            const mapped: DomainItem[] = json.data.map((d: any) => ({
+              icon: ICON_MAP[d.iconName] || Code2,
+              title: d.name,
+              sessions: d.sessionsLabel || '0 SESSIONS',
+              description: d.description,
+            }));
+            setDomains(mapped);
+          }
+        }
+      } catch {}
+    }
+    fetchDomains();
+  }, []);
 
   return (
     <section id="domains" className="relative py-24 md:py-32 overflow-hidden">
@@ -50,7 +90,7 @@ export const Domains: React.FC = () => {
 
         {/* 2x2 Grid of Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-          {DOMAIN_DATA.map((domain, idx) => {
+          {domains.map((domain, idx) => {
             const Icon = domain.icon;
             return (
               <div

@@ -8,8 +8,11 @@ import { TeamPage } from "./pages/TeamPage.tsx";
 import { EventsPage } from "./pages/EventsPage.tsx";
 import { BlogPage } from "./pages/BlogPage.tsx";
 import { ContributorsPage } from "./pages/ContributorsPage.tsx";
+import { AboutPage } from "./pages/AboutPage.tsx";
+import { ContactPage } from "./pages/ContactPage.tsx";
 import { AdminApp } from "./admin/AdminApp.tsx";
 import "./index.css";
+
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -26,6 +29,8 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="events" element={<EventsPage />} />
             <Route path="blog" element={<BlogPage />} />
             <Route path="contributors" element={<ContributorsPage />} />
+            <Route path="about" element={<AboutPage />} />
+            <Route path="contact" element={<ContactPage />} />
           </Route>
 
           {/* 404 Fallback */}

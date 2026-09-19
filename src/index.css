@@ -138,19 +138,14 @@
   animation: textFlicker 3s infinite;
 }
 
-/* Cyberpunk Floating Navbar Shimmer */
+/* Cyberpunk Floating Navbar Shimmer — contained border-only effect */
 .cyber-shimmer-bg {
-  position: relative;
-}
-
-.cyber-shimmer-bg::before,
-.cyber-shimmer-glow {
-  content: "";
   position: absolute;
-  top: -60%;
-  left: -60%;
-  width: 220%;
-  height: 220%;
+  inset: 0;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
   background: conic-gradient(
     from 0deg,
     #00ff66 0deg 85deg,
@@ -159,7 +154,7 @@
     #5dfcaa 270deg 360deg
   );
   animation: rotateCyber 5s linear infinite;
-  z-index: -1;
+  z-index: 0;
 }
 
 @keyframes rotateCyber {

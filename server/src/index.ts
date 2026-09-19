@@ -20,6 +20,7 @@ import mediaRoutes from "./routes/media.routes.js";
 import blogRoutes from "./routes/blog.routes.js";
 import contributorsRoutes from "./routes/contributors.routes.js";
 import applicationsRoutes from "./routes/applications.routes.js";
+import contactRoutes from "./routes/contact.routes.js";
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -91,6 +92,8 @@ app.use("/api/admin/media", mediaRoutes);
 app.use("/api", blogRoutes); // handles /api/public/blog and /api/admin/blog
 app.use("/api", contributorsRoutes); // handles /api/public/contributors and /api/admin/contributors
 app.use("/api", applicationsRoutes); // handles /api/public/join and /api/admin/applications
+app.use("/api", contactRoutes); // handles /api/public/contact and /api/admin/messages
+
 
 
 // Global Error Handler

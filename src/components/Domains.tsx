@@ -1,0 +1,88 @@
+import React from 'react';
+import { Code2, Crown, Users, Rocket } from 'lucide-react';
+import { useScrambleText } from '../hooks/useScrambleText.ts';
+
+const DOMAIN_DATA = [
+  {
+    icon: Code2,
+    title: "Technical Skill Building",
+    sessions: "5 SESSIONS",
+    description: "Hands-on workshops, coding sessions, and tech talks that turn theory into working software."
+  },
+  {
+    icon: Crown,
+    title: "Leadership & Governance",
+    sessions: "3 SESSIONS",
+    description: "Annual elections for President, Secretary, and office bearers — guided by the HOD and Faculty Coordinator."
+  },
+  {
+    icon: Users,
+    title: "Events & Collaboration",
+    sessions: "8 SESSIONS",
+    description: "Hackathons, seminars, and department-level competitions that bring students together."
+  },
+  {
+    icon: Rocket,
+    title: "Industry Readiness",
+    sessions: "4 SESSIONS",
+    description: "Bridging classroom learning with real-world application to prepare students for the field."
+  }
+];
+
+export const Domains: React.FC = () => {
+  const { displayText, ref } = useScrambleText("Our Domains");
+
+  return (
+    <section id="domains" className="relative py-24 md:py-32 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
+        
+        <div className="mb-12">
+          <div className="font-mono text-sm tracking-widest text-[#00ff66] mb-3">
+            // WHAT WE DO
+          </div>
+          <h2
+            ref={ref}
+            className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white text-glow"
+          >
+            {displayText}
+          </h2>
+        </div>
+
+        {/* 2x2 Grid of Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+          {DOMAIN_DATA.map((domain, idx) => {
+            const Icon = domain.icon;
+            return (
+              <div
+                key={idx}
+                className="group relative rounded-xl p-8 bg-[#08160c]/70 backdrop-blur-md border border-[#00ff66]/15 hover:border-[#00ff66]/60 transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,255,102,0.18)] hover:-translate-y-1"
+              >
+                {/* Top Row: Icon + Badge */}
+                <div className="flex items-center justify-between mb-6">
+                  <div className="w-12 h-12 rounded-lg bg-[#00ff66]/10 border border-[#00ff66]/30 flex items-center justify-center text-[#00ff66] group-hover:bg-[#00ff66] group-hover:text-black transition-all duration-300 group-hover:shadow-[0_0_15px_#00ff66]">
+                    <Icon className="w-6 h-6" />
+                  </div>
+                  
+                  <span className="font-mono text-xs tracking-widest text-[#00ff66] font-semibold px-2.5 py-1 rounded bg-[#00ff66]/5 border border-[#00ff66]/20">
+                    {domain.sessions}
+                  </span>
+                </div>
+
+                {/* Title */}
+                <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 group-hover:text-[#00ff66] transition-colors">
+                  {domain.title}
+                </h3>
+
+                {/* Description */}
+                <p className="font-mono text-sm sm:text-base text-[#a0c0a8] leading-relaxed">
+                  {domain.description}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+
+      </div>
+    </section>
+  );
+};

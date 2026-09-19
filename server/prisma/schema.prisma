@@ -154,3 +154,38 @@ model MediaAsset {
   createdAt DateTime @default(now())
 }
 
+model Contributor {
+  id           String   @id @default(cuid())
+  name         String
+  role         String   // e.g. "Technical Coordinator", "Event Host", "Volunteer Lead"
+  eventName    String   // e.g. "Prompt Ops-2K26", "Lumière Gala"
+  department   String   @default("Computer Science & Engineering")
+  batch        String?  // e.g. "3rd Year CSE", "Batch 2026"
+  photoUrl     String?
+  bio          String?
+  github       String?
+  linkedin     String?
+  instagram    String?
+  displayOrder Int      @default(0)
+  isPublished  Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model JoinApplication {
+  id         String   @id @default(cuid())
+  name       String
+  email      String
+  phone      String?
+  usn        String?
+  semester   String?
+  domain     String?  // Technical, Design, Media, Events
+  reason     String
+  skills     String?
+  status     String   @default("PENDING") // PENDING, REVIEWED, ACCEPTED, REJECTED
+  adminNotes String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+

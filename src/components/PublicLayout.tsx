@@ -32,7 +32,10 @@ export const PublicLayout: React.FC = () => {
       </div>
 
       {/* Global Footer */}
-      <Footer onOpenRootAccess={() => setIsRootAccessOpen(true)} />
+      <Footer
+        onOpenRootAccess={() => setIsRootAccessOpen(true)}
+        onOpenJoinModal={() => setIsJoinModalOpen(true)}
+      />
 
       {/* Modals */}
       <JoinModal

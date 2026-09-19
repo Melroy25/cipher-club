@@ -288,6 +288,96 @@ async function main() {
     }
   }
 
+  // 7. Contributors
+  const existingContributors = await prisma.contributor.count();
+  if (existingContributors === 0) {
+    console.log("Seeding event contributors...");
+    const sampleContributors = [
+      {
+        name: "Chinmayee",
+        role: "Event Co-Lead & Track Winner",
+        eventName: "Prompt Ops-2K26",
+        department: "Computer Science & Engineering",
+        batch: "1st Year CSE",
+        photoUrl: "/assets/leaders/chaitra.jpg",
+        bio: "Top honors in Track 1 of Prompt Ops-2K26; assisted in prompt engineering testbed documentation and peer mentoring.",
+        github: "https://github.com",
+        linkedin: "https://linkedin.com",
+        displayOrder: 1,
+        isPublished: true,
+      },
+      {
+        name: "Chris Royston Monteiro",
+        role: "Technical Evaluator",
+        eventName: "Prompt Ops-2K26",
+        department: "Computer Science & Engineering",
+        batch: "2nd Year CSE",
+        photoUrl: "/assets/leaders/elston.jpg",
+        bio: "Designed evaluation criteria for image generation prompts and assisted in participant scoring automation.",
+        github: "https://github.com",
+        linkedin: "https://linkedin.com",
+        displayOrder: 2,
+        isPublished: true,
+      },
+      {
+        name: "Harimurali K S",
+        role: "API Security Challenge Lead",
+        eventName: "Prompt Ops-2K26",
+        department: "Computer Science & Engineering",
+        batch: "3rd Year CSE",
+        photoUrl: "/assets/leaders/raynell.jpg",
+        bio: "Built the adversarial Gemini prompt extraction challenges for Track 2 and configured live rate limiting.",
+        github: "https://github.com",
+        linkedin: "https://linkedin.com",
+        displayOrder: 3,
+        isPublished: true,
+      },
+      {
+        name: "Venus Suhani D’Lima",
+        role: "Stage & Logistics Coordinator",
+        eventName: "Lumière — The Gala",
+        department: "Computer Science & Engineering",
+        batch: "2nd Year CSE",
+        photoUrl: "/assets/leaders/nazmin.jpg",
+        bio: "Coordinated stage arrangements, entry pass management, and hospitality for faculty guests during the branch entry gala.",
+        github: "https://github.com",
+        linkedin: "https://linkedin.com",
+        displayOrder: 4,
+        isPublished: true,
+      },
+      {
+        name: "Deeksha Ravi Moger",
+        role: "Creative Media & Banner Lead",
+        eventName: "Lumière — The Gala",
+        department: "Computer Science & Engineering",
+        batch: "2nd Year CSE",
+        photoUrl: "/assets/leaders/jeslin.jpg",
+        bio: "Designed main stage backdrop visual assets, social media flyers, and coordinated lighting aesthetics.",
+        github: "https://github.com",
+        linkedin: "https://linkedin.com",
+        displayOrder: 5,
+        isPublished: true,
+      },
+      {
+        name: "Venisha Snehal D’Souza",
+        role: "Workshop Mentor",
+        eventName: "Smart Contract Bootcamp",
+        department: "Computer Science & Engineering",
+        batch: "4th Year CSE",
+        photoUrl: "/assets/leaders/chaitra.jpg",
+        bio: "Helped 60+ junior students debug Hardhat smart contract deployments and Sepolia faucet transactions.",
+        github: "https://github.com",
+        linkedin: "https://linkedin.com",
+        displayOrder: 6,
+        isPublished: true,
+      },
+    ];
+
+    for (const c of sampleContributors) {
+      await prisma.contributor.create({ data: c });
+    }
+  }
+
   console.log("Seeding completed successfully!");
 }
 

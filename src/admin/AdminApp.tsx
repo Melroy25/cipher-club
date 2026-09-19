@@ -12,6 +12,8 @@ import { ActivitiesPage } from "./pages/ActivitiesPage.tsx";
 import { DomainsPage } from "./pages/DomainsPage.tsx";
 import { ContentPage } from "./pages/ContentPage.tsx";
 import { BlogPage } from "./pages/BlogPage.tsx";
+import { ContributorsPage } from "./pages/ContributorsPage.tsx";
+import { ApplicationsPage } from "./pages/ApplicationsPage.tsx";
 import { MediaPage } from "./pages/MediaPage.tsx";
 import { SettingsPage } from "./pages/SettingsPage.tsx";
 import { Loader2 } from "lucide-react";
@@ -65,6 +67,8 @@ export const AdminApp: React.FC = () => {
               <Route path="activities" element={<ActivitiesPage />} />
               <Route path="domains" element={<DomainsPage />} />
               <Route path="blog" element={<BlogPage />} />
+              <Route path="contributors" element={<ContributorsPage />} />
+              <Route path="applications" element={<ApplicationsPage />} />
               <Route path="content" element={<ContentPage />} />
               <Route path="media" element={<MediaPage />} />
               <Route path="settings" element={<SettingsPage />} />

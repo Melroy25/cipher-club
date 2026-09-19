@@ -7,6 +7,7 @@ import { HomePage } from "./pages/HomePage.tsx";
 import { TeamPage } from "./pages/TeamPage.tsx";
 import { EventsPage } from "./pages/EventsPage.tsx";
 import { BlogPage } from "./pages/BlogPage.tsx";
+import { ContributorsPage } from "./pages/ContributorsPage.tsx";
 import { AdminApp } from "./admin/AdminApp.tsx";
 import "./index.css";
 
@@ -24,6 +25,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             <Route path="team" element={<TeamPage />} />
             <Route path="events" element={<EventsPage />} />
             <Route path="blog" element={<BlogPage />} />
+            <Route path="contributors" element={<ContributorsPage />} />
           </Route>
 
           {/* 404 Fallback */}

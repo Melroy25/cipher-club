@@ -21,7 +21,7 @@ export default function App() {
   const [isRootAccessOpen, setIsRootAccessOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#030804] text-white selection:bg-[#00ff66] selection:text-black relative">
+    <div className="public-site-cursor min-h-screen bg-[#030804] text-white selection:bg-[#00ff66] selection:text-black relative">
       {/* Custom Cursor */}
       <CustomCursor />
 

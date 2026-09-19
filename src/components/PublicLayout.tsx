@@ -7,8 +7,10 @@ import { CRTOverlay } from "./CRTOverlay.tsx";
 import { TopographicBackground } from "./TopographicBackground.tsx";
 import { JoinModal } from "./JoinModal.tsx";
 import { RootAccessModal } from "./RootAccessModal.tsx";
+import { IntroBoot } from "./IntroBoot.tsx";
 
 export const PublicLayout: React.FC = () => {
+  const [isBooting, setIsBooting] = useState(true);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [isRootAccessOpen, setIsRootAccessOpen] = useState(false);
 
@@ -20,22 +22,28 @@ export const PublicLayout: React.FC = () => {
       {/* CRT Scanline & Vignette Effect */}
       <CRTOverlay />
 
+      {/* Intro Terminal Boot Sequence on open / refresh */}
+      {isBooting && <IntroBoot onComplete={() => setIsBooting(false)} />}
+
       {/* Dynamic Topographic Wave Canvas */}
       <TopographicBackground />
 
-      {/* Floating Cyber Navbar */}
-      <Navbar />
+      {/* Main Website Structure */}
+      <div className={`transition-opacity duration-700 ${isBooting ? "opacity-0" : "opacity-100"}`}>
+        {/* Floating Cyber Navbar */}
+        <Navbar />
 
-      {/* Main Page Content */}
-      <div className="relative z-10 pt-24 min-h-[calc(100vh-200px)]">
-        <Outlet context={{ onOpenJoinModal: () => setIsJoinModalOpen(true) }} />
+        {/* Main Page Content */}
+        <div className="relative z-10 pt-24 min-h-[calc(100vh-200px)]">
+          <Outlet context={{ onOpenJoinModal: () => setIsJoinModalOpen(true) }} />
+        </div>
+
+        {/* Global Footer */}
+        <Footer
+          onOpenRootAccess={() => setIsRootAccessOpen(true)}
+          onOpenJoinModal={() => setIsJoinModalOpen(true)}
+        />
       </div>
-
-      {/* Global Footer */}
-      <Footer
-        onOpenRootAccess={() => setIsRootAccessOpen(true)}
-        onOpenJoinModal={() => setIsJoinModalOpen(true)}
-      />
 
       {/* Modals */}
       <JoinModal

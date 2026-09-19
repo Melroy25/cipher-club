@@ -185,6 +185,11 @@ export const Footer: React.FC<FooterProps> = ({ onOpenRootAccess, onOpenJoinModa
                 </Link>
               </li>
               <li>
+                <Link to="/about" className="hover:text-[#00ff66] transition-colors flex items-center gap-1.5">
+                  <span className="text-[#00ff66]/60">&gt;</span> About Association
+                </Link>
+              </li>
+              <li>
                 <Link to="/events" className="hover:text-[#00ff66] transition-colors flex items-center gap-1.5">
                   <span className="text-[#00ff66]/60">&gt;</span> Events &amp; Workshops
                 </Link>
@@ -192,6 +197,11 @@ export const Footer: React.FC<FooterProps> = ({ onOpenRootAccess, onOpenJoinModa
               <li>
                 <Link to="/team" className="hover:text-[#00ff66] transition-colors flex items-center gap-1.5">
                   <span className="text-[#00ff66]/60">&gt;</span> Leadership Team
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact" className="hover:text-[#00ff66] transition-colors flex items-center gap-1.5 text-[#00ff66]">
+                  <span className="text-[#00ff66]/60">&gt;</span> Join / Contact
                 </Link>
               </li>
               <li>

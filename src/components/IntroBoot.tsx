@@ -8,7 +8,7 @@ const TERMINAL_LINES = [
   "establishing connection...",
   "authenticating access...",
   "decrypting CIPHER_v1.0...",
-  "loading modules... [=========] 100%",
+  "loading modules... [==========] 100%",
   "access granted"
 ];
 
@@ -145,12 +145,12 @@ export const IntroBoot: React.FC<IntroBootProps> = ({ onComplete }) => {
   }, [phase, onComplete]);
 
   const handleSkip = () => {
-    setPhase('shutoff');
+    onComplete();
   };
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-[#030804] select-none ${
+      className={`fixed inset-0 z-[99999] flex items-center justify-center bg-[#030804] select-none ${
         phase === 'shutoff' ? 'animate-crt-off' : ''
       }`}
     >

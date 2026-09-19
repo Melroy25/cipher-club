@@ -45,9 +45,9 @@ export const Navbar: React.FC = () => {
   const navLinks = [
     { name: "HOME", path: "/" },
     { name: "ABOUT", path: "/about" },
-    { name: "BLOG", path: "/blog" },
-    { name: "TEAM", path: "/team" },
     { name: "EVENTS", path: "/events" },
+    { name: "TEAM", path: "/team" },
+    { name: "JOIN / CONTACT", path: "/contact" },
   ];
 
   const isActive = (path: string) => {

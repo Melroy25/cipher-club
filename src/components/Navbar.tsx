@@ -58,26 +58,32 @@ export const Navbar: React.FC = () => {
 
   return (
     <>
-      {/* Outer Floating Bar with Cyber Rotating Shimmer */}
+      {/* Outer Floating Bar with Cyber Rotating Shimmer - Sleek Thin Rectangle */}
       <div
-        className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] md:w-[85%] max-w-5xl rounded-2xl p-[2px] overflow-hidden cyber-shimmer-bg transition-all duration-300 ${
+        className={`fixed top-3 md:top-4 left-1/2 -translate-x-1/2 z-50 w-[96%] md:w-[92%] lg:w-[90%] max-w-6xl rounded-lg p-[1.5px] overflow-hidden cyber-shimmer-bg transition-all duration-300 ${
           scrolled
-            ? "shadow-[0_8px_32px_rgba(0,255,102,0.2)] scale-[0.98]"
-            : "shadow-[0_4px_24px_rgba(0,0,0,0.6)]"
+            ? "shadow-[0_8px_32px_rgba(0,255,102,0.25)] scale-[0.99]"
+            : "shadow-[0_4px_24px_rgba(0,0,0,0.7)]"
         }`}
       >
         {/* Glow halo behind header */}
         <div className="absolute inset-0 cyber-shimmer-glow opacity-30 blur-md pointer-events-none" />
 
-        {/* Inner Glassmorphic Header */}
-        <header className="w-full rounded-[14px] backdrop-blur-xl bg-[#030804]/90 dark:bg-[#030804]/90 border border-[#00ff66]/25 transition-colors">
-          <div className="flex items-center justify-between px-5 md:px-7 py-3">
-            {/* Left: Dynamic Club Logo */}
-            <Link to="/" className="flex items-center gap-3 group">
+        {/* Inner Glassmorphic Header with Sleek Rectangular Shape and Subtle Cyber Corner Marks */}
+        <header className="relative w-full rounded-[6px] backdrop-blur-xl bg-[#030804]/92 dark:bg-[#030804]/92 border border-[#00ff66]/25 transition-colors">
+          {/* Subtle Cyber Corner Reticles for High-Tech Rectangular HUD Aesthetic */}
+          <div className="absolute top-1 left-1 w-2 h-2 border-t border-l border-[#00ff66]/60 pointer-events-none" />
+          <div className="absolute top-1 right-1 w-2 h-2 border-t border-r border-[#00ff66]/60 pointer-events-none" />
+          <div className="absolute bottom-1 left-1 w-2 h-2 border-b border-l border-[#00ff66]/60 pointer-events-none" />
+          <div className="absolute bottom-1 right-1 w-2 h-2 border-b border-r border-[#00ff66]/60 pointer-events-none" />
+
+          <div className="flex items-center justify-between px-4 md:px-6 py-1.5 md:py-2">
+            {/* Left: Dynamic Club Logo & Name */}
+            <Link to="/" className="flex items-center gap-2.5 group flex-shrink-0">
               <img
                 src={logoUrl}
                 alt="Cipher Logo"
-                className="h-8 md:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_0_10px_rgba(0,255,102,0.5)]"
+                className="h-7 md:h-8 w-auto object-contain transition-transform duration-300 group-hover:scale-105 drop-shadow-[0_0_8px_rgba(0,255,102,0.5)]"
                 onError={() => setLogoUrl("/assets/logo.png")}
               />
               <span className="font-mono text-xs tracking-wider text-[#00ff66] hidden sm:inline-block font-bold">
@@ -86,12 +92,12 @@ export const Navbar: React.FC = () => {
             </Link>
 
             {/* Center: Nav Buttons with High-Tech Corner Brackets */}
-            <nav className="hidden md:flex items-center space-x-2 lg:space-x-4 font-mono text-xs lg:text-sm tracking-widest text-[#88aa90]">
+            <nav className="hidden md:flex items-center space-x-1 lg:space-x-3 font-mono text-xs tracking-widest text-[#88aa90]">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
-                  className={`corner-link uppercase ${
+                  className={`corner-link uppercase py-1 px-3 ${
                     isActive(link.path)
                       ? "active text-[#00ff66] font-bold"
                       : "hover:text-[#00ff66]"
@@ -103,25 +109,25 @@ export const Navbar: React.FC = () => {
             </nav>
 
             {/* Right: Dark / Light Mode Switch & Mobile Menu Toggle */}
-            <div className="flex items-center gap-3">
-              {/* Sliding Pill Theme Toggle */}
+            <div className="flex items-center gap-2.5 flex-shrink-0">
+              {/* Sliding Rectangular Cyber Theme Toggle */}
               <button
                 type="button"
                 onClick={toggleTheme}
                 aria-label="Toggle dark/light theme"
-                className="group relative w-16 h-8 rounded-full bg-[#051408] border border-[#00ff66]/30 backdrop-blur-xl transition-all duration-300 flex items-center p-1 overflow-hidden hover:border-[#00ff66] focus:outline-none"
+                className="group relative w-14 h-7 rounded-md bg-[#051408] border border-[#00ff66]/30 backdrop-blur-xl transition-all duration-300 flex items-center p-0.5 overflow-hidden hover:border-[#00ff66] focus:outline-none"
               >
                 {/* Sun & Moon Icons inside */}
-                <div className="relative z-10 flex w-full justify-between items-center px-1 pointer-events-none text-xs">
+                <div className="relative z-10 flex w-full justify-between items-center px-1.5 pointer-events-none text-xs">
                   <Sun
-                    className={`w-3.5 h-3.5 transition-colors ${
+                    className={`w-3 h-3 transition-colors ${
                       theme === "light"
                         ? "text-yellow-400 font-bold"
                         : "text-[#88aa90] group-hover:text-yellow-400"
                     }`}
                   />
                   <Moon
-                    className={`w-3.5 h-3.5 transition-colors ${
+                    className={`w-3 h-3 transition-colors ${
                       theme === "dark"
                         ? "text-[#00ff66] font-bold"
                         : "text-[#88aa90] group-hover:text-[#00ff66]"
@@ -129,10 +135,10 @@ export const Navbar: React.FC = () => {
                   />
                 </div>
 
-                {/* Sliding Indicator Knob */}
+                {/* Sliding Indicator Knob - sleek rounded-sm */}
                 <div
-                  className={`absolute top-1 w-6 h-6 rounded-full bg-[#00ff66] shadow-[0_0_12px_rgba(0,255,102,0.8)] transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
-                    theme === "dark" ? "translate-x-8" : "translate-x-0"
+                  className={`absolute top-0.5 w-6 h-5.5 rounded-sm bg-[#00ff66] shadow-[0_0_10px_rgba(0,255,102,0.8)] transition-transform duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] ${
+                    theme === "dark" ? "translate-x-7" : "translate-x-0"
                   }`}
                 />
               </button>
@@ -142,12 +148,12 @@ export const Navbar: React.FC = () => {
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                 aria-label="Toggle mobile menu"
-                className="md:hidden p-2 rounded-lg text-[#00ff66] hover:bg-[#00ff66]/10 border border-[#00ff66]/20 transition-colors focus:outline-none"
+                className="md:hidden p-1.5 rounded-md text-[#00ff66] hover:bg-[#00ff66]/10 border border-[#00ff66]/20 transition-colors focus:outline-none"
               >
                 {mobileMenuOpen ? (
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 ) : (
-                  <Menu className="w-5 h-5" />
+                  <Menu className="w-4 h-4" />
                 )}
               </button>
             </div>

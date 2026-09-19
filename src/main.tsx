@@ -1,17 +1,35 @@
-﻿import React from "react";
+import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import App from "./App.tsx";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ThemeProvider } from "./context/ThemeContext.tsx";
+import { PublicLayout } from "./components/PublicLayout.tsx";
+import { HomePage } from "./pages/HomePage.tsx";
+import { TeamPage } from "./pages/TeamPage.tsx";
+import { EventsPage } from "./pages/EventsPage.tsx";
+import { BlogPage } from "./pages/BlogPage.tsx";
 import { AdminApp } from "./admin/AdminApp.tsx";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/admin/*" element={<AdminApp />} />
-        <Route path="/*" element={<App />} />
-      </Routes>
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Admin CMS Routes */}
+          <Route path="/admin/*" element={<AdminApp />} />
+
+          {/* Public Website Routes with Shared Cyber Floating Navbar */}
+          <Route path="/" element={<PublicLayout />}>
+            <Route index element={<HomePage />} />
+            <Route path="team" element={<TeamPage />} />
+            <Route path="events" element={<EventsPage />} />
+            <Route path="blog" element={<BlogPage />} />
+          </Route>
+
+          {/* 404 Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   </React.StrictMode>
 );

@@ -137,3 +137,126 @@
 .animate-flicker {
   animation: textFlicker 3s infinite;
 }
+
+/* Cyberpunk Floating Navbar Shimmer */
+.cyber-shimmer-bg {
+  position: relative;
+}
+
+.cyber-shimmer-bg::before,
+.cyber-shimmer-glow {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: -60%;
+  width: 220%;
+  height: 220%;
+  background: conic-gradient(
+    from 0deg,
+    #00ff66 0deg 85deg,
+    #00f0ff 90deg 175deg,
+    #02260f 180deg 265deg,
+    #5dfcaa 270deg 360deg
+  );
+  animation: rotateCyber 5s linear infinite;
+  z-index: -1;
+}
+
+@keyframes rotateCyber {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Corner bracket link hover animation */
+.corner-link {
+  position: relative;
+  padding: 0.35rem 0.75rem;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.corner-link::before,
+.corner-link::after {
+  content: "";
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border: 1.5px solid #00ff66;
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.corner-link::before {
+  top: 0;
+  left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  transform: translate(2px, 2px);
+}
+
+.corner-link::after {
+  bottom: 0;
+  right: 0;
+  border-left: 0;
+  border-top: 0;
+  transform: translate(-2px, -2px);
+}
+
+.corner-link:hover::before,
+.corner-link:hover::after,
+.corner-link.active::before,
+.corner-link.active::after {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+.corner-link.active {
+  color: #00ff66 !important;
+  text-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
+}
+
+/* Light Mode Overrides */
+html.light {
+  background-color: #f4faf5;
+  color: #05260f;
+}
+
+html.light body {
+  background-color: #f4faf5;
+  color: #05260f;
+}
+
+html.light .bg-\[\#030804\] {
+  background-color: #f4faf5 !important;
+}
+
+html.light .bg-\[\#020703\],
+html.light .bg-\[\#020603\] {
+  background-color: #eaf5ec !important;
+}
+
+html.light .text-white {
+  color: #062b11 !important;
+}
+
+html.light .text-\[\#88aa90\],
+html.light .text-\[\#a0c0a8\] {
+  color: #2b5437 !important;
+}
+
+html.light .border-\[\#00ff66\]\/15,
+html.light .border-\[\#00ff66\]\/20,
+html.light .border-\[\#00ff66\]\/30 {
+  border-color: rgba(0, 168, 67, 0.3) !important;
+}
+
+html.light .crt-scanlines {
+  opacity: 0.15;
+}

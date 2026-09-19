@@ -1,6 +1,7 @@
-﻿import React, { useState, useEffect } from "react";
-import { Save, Loader2, RefreshCw, CheckCircle2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Save, Loader2, RefreshCw, CheckCircle2, Image as ImageIcon } from "lucide-react";
 import { useToast } from "../context/ToastContext.tsx";
+import { ImageUploader } from "../components/ImageUploader.tsx";
 
 interface ContentItem {
   id: string;
@@ -14,7 +15,7 @@ interface ContentItem {
 export const ContentPage: React.FC = () => {
   const [items, setItems] = useState<ContentItem[]>([]);
   const [contentValues, setContentValues] = useState<Record<string, string>>({});
-  const [activeTab, setActiveTab] = useState<string>("hero");
+  const [activeTab, setActiveTab] = useState<string>("brand");
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -74,6 +75,7 @@ export const ContentPage: React.FC = () => {
   };
 
   const tabs = [
+    { id: "brand", label: "Logo & Branding" },
     { id: "hero", label: "Hero Section" },
     { id: "about", label: "About Section" },
     { id: "activities", label: "Activities Copy" },
@@ -89,7 +91,7 @@ export const ContentPage: React.FC = () => {
         <div>
           <h2 className="text-xl font-bold font-mono text-white">Website Content Editor</h2>
           <p className="font-mono text-xs text-[#88aa90]">
-            Update public headings, narrative text, call-to-actions, and links directly
+            Update public headings, narrative text, logo branding, and links directly
           </p>
         </div>
 
@@ -137,7 +139,7 @@ export const ContentPage: React.FC = () => {
         ) : (
           <form onSubmit={handleSave} className="space-y-6 max-w-3xl">
             {currentSectionItems.map((item) => (
-              <div key={item.key} className="space-y-1.5">
+              <div key={item.key} className="space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="font-mono text-xs font-bold text-white flex items-center gap-2">
                     <span className="text-[#00ff66]">&gt;</span> {item.label}
@@ -145,7 +147,33 @@ export const ContentPage: React.FC = () => {
                   <span className="text-[10px] font-mono text-[#88aa90]">{item.key}</span>
                 </div>
 
-                {item.type === "textarea" ? (
+                {item.type === "image" ? (
+                  <div className="p-4 rounded-xl bg-[#020703] border border-[#00ff66]/20 space-y-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-20 h-20 rounded-lg bg-[#040e06] border border-[#00ff66]/30 flex items-center justify-center p-2 flex-shrink-0">
+                        <img
+                          src={contentValues[item.key] ?? item.value}
+                          alt="Logo Preview"
+                          className="max-h-full max-w-full object-contain"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = "/assets/logo.png";
+                          }}
+                        />
+                      </div>
+                      <div>
+                        <p className="font-mono text-xs font-bold text-white">Current Logo Preview</p>
+                        <p className="font-mono text-[11px] text-[#88aa90]">
+                          Displayed in the floating navbar on every page.
+                        </p>
+                      </div>
+                    </div>
+                    <ImageUploader
+                      value={contentValues[item.key] ?? item.value}
+                      onChange={(url) => handleChange(item.key, url)}
+                      label="Upload New Logo or Enter URL"
+                    />
+                  </div>
+                ) : item.type === "textarea" ? (
                   <textarea
                     rows={4}
                     value={contentValues[item.key] ?? item.value}

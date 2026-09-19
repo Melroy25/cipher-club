@@ -1,4 +1,4 @@
-﻿import { prisma } from "../lib/prisma.js";
+import { prisma } from "../lib/prisma.js";
 
 async function main() {
   console.log("Seeding Cipher Club initial data...");
@@ -182,6 +182,7 @@ async function main() {
   // 5. Website Content
   console.log("Seeding website content...");
   const contentItems = [
+    { key: "site_logo_url", value: "/assets/logo.png", section: "brand", label: "Navbar & Club Logo Image", type: "image" },
     { key: "hero_title", value: "Student Association of Computer Science & Engineering", section: "hero", label: "Hero Main Title", type: "text" },
     { key: "hero_subtitle", value: "Bridging academic knowledge and practical application – a community of aspiring professionals in computing.", section: "hero", label: "Hero Subtitle", type: "textarea" },
     { key: "hero_join_btn", value: "JOIN CIPHER", section: "hero", label: "Hero Join Button Text", type: "text" },

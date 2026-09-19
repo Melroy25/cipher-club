@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Calendar, MapPin, Images, Sparkles, Filter } from "lucide-react";
+import { Calendar, MapPin, Images, Sparkles, Filter, Clock, ArrowRight, Trophy, BookOpen, Layers } from "lucide-react";
 import { EventData, EventModal } from "../components/EventModal.tsx";
 
 const DEFAULT_EVENTS: EventData[] = [
@@ -14,9 +14,9 @@ const DEFAULT_EVENTS: EventData[] = [
     description:
       "A technical competition on prompt engineering and AI tools by the AgentBlazer Club and Cipher. Track 1 covered invitation, logo and image recreation; Track 2 tested JSON conversion, Python debugging and a Gemini AI security prompt challenge.",
     fullDescription: [
-      "Organized by the AgentBlazer Club and Cipher under the guidance of Ms. Nisha J Roche, Ms. Jaishma K, and HOD Dr. Melwyn D’Souza, this technical competition focused on prompt engineering and AI tools (mapped to PO4, PO5, PO8, PO11).",
+      "Organized by the AgentBlazer Club and Cipher under the guidance of Ms. Nisha J Roche, Ms. Jaishma K, and HOD Dr. Melwyn D'Souza, this technical competition focused on prompt engineering and AI tools (mapped to PO4, PO5, PO8, PO11).",
       "Track 1 (1st Year) featured invitation generation, logo recreation, and image recreation rounds, with Chinmayee, Chris Royston Monteiro, and Deeksha Ravi Moger taking top honors.",
-      "Track 2 (2nd Year) tested students in JSON conversion, Python code debugging, and a Gemini AI security prompt extraction challenge, with Harimurali KS, Venus Suhani D’Lima, and Venisha Snehal D’Souza securing top positions.",
+      "Track 2 (2nd Year) tested students in JSON conversion, Python code debugging, and a Gemini AI security prompt extraction challenge, with Harimurali KS, Venus Suhani D'Lima, and Venisha Snehal D'Souza securing top positions.",
     ],
     slides: [
       "/assets/promptops/slide_01.jpg",
@@ -38,10 +38,10 @@ const DEFAULT_EVENTS: EventData[] = [
     slug: "LUMIERE_GALA",
     cardSub: "CSE Branch Entry · Kalam Auditorium",
     description:
-      "The CSE branch entry programme at Kalam Auditorium, themed “Where Glam Meets Glow.” Organised by the Cipher Association with coordinated red, gold and black décor, it welcomed students into the department and reinforced a shared sense of collective identity.",
+      "The CSE branch entry programme at Kalam Auditorium, themed 'Where Glam Meets Glow.' Organised by the Cipher Association with coordinated red, gold and black décor, it welcomed students into the department and reinforced a shared sense of collective identity.",
     fullDescription: [
-      "The Department of Computer Science and Engineering (CSE) held its branch entry programme, “Lumière – The Gala,” on 29 October 2025 at the Kalam Auditorium. Organised by the Cipher Association, the event welcomed students into the department through a formal gathering centred on the theme “Where Glam Meets Glow.” The venue featured coordinated red, gold and black décor, floral arrangements, illuminated panels and a central Lumière backdrop.",
-      "The programme gave students an opportunity to interact with peers and take part in a shared departmental event beyond academics, highlighting the role of the Cipher Association in organising student-led activities. It concluded as a formal branch entry that marked the students’ transition into the department and reinforced a sense of collective identity.",
+      "The Department of Computer Science and Engineering (CSE) held its branch entry programme, 'Lumière – The Gala,' on 29 October 2025 at the Kalam Auditorium. Organised by the Cipher Association, the event welcomed students into the department through a formal gathering centred on the theme 'Where Glam Meets Glow.'",
+      "The programme gave students an opportunity to interact with peers and take part in a shared departmental event beyond academics, highlighting the role of the Cipher Association in organising student-led activities. It concluded as a formal branch entry that marked the students' transition into the department and reinforced a sense of collective identity.",
     ],
     slides: [
       "/assets/lumiere/slide_01.jpg",
@@ -54,12 +54,64 @@ const DEFAULT_EVENTS: EventData[] = [
       "/assets/lumiere/slide_08.jpg",
     ],
   },
+  {
+    id: "solidity-workshop",
+    tag: "WORKSHOP",
+    dateTag: "14 FEB 2026",
+    title: "Smart Contract Dev Bootcamp",
+    subTitle: "14 FEBRUARY 2026 · TECHNICAL SESSION",
+    slug: "SOLIDITY_WORKSHOP",
+    cardSub: "Cipher Technical Domain",
+    description:
+      "A hands-on workshop covering Solidity fundamentals, EVM architecture, gas optimization, and deploying ERC-20 token contracts on the Sepolia testnet. Beginner to intermediate track.",
+    fullDescription: [
+      "Cipher's Technical Domain track hosted an intensive Solidity and Web3 developer crash course for CSE students.",
+      "We started with the Ethereum Virtual Machine (EVM) stack model, memory vs storage vs calldata, and why gas optimization matters when deploying production code.",
+      "Students created their own ERC-20 token contract, wrote automated test suites with Hardhat, and successfully broadcasted deployment transactions to the Sepolia testnet.",
+    ],
+    slides: [
+      "/assets/promptops/slide_01.jpg",
+      "/assets/promptops/slide_02.jpg",
+      "/assets/promptops/slide_03.jpg",
+    ],
+  },
+  {
+    id: "udaan-mock",
+    tag: "CAREER",
+    dateTag: "05 JAN 2026",
+    title: "UDAAN Mock Interview Drive",
+    subTitle: "05 JANUARY 2026 · PLACEMENT PREP",
+    slug: "UDAAN_MOCK",
+    cardSub: "Cipher Senior Council",
+    description:
+      "A three-round mock interview program simulating campus and off-campus technical evaluations. Conducted by Cipher alumni placed in top product companies, covering DSA, system design, and HR rounds.",
+    fullDescription: [
+      "The UDAAN Mock Interview initiative was established to simulate real-world campus recruitment and off-campus tech evaluations.",
+      "Through three rigorous rounds—DSA problem solving, system architecture discussions, and HR behavioral screenings—candidates received real-time constructive feedback from seniors placed in top product companies.",
+      "Key takeaway: Communicate thought processes before writing code. Deep fundamentals in OS, DBMS indexing, and networking protocols matter far more than buzzwords on resumes.",
+    ],
+    slides: [
+      "/assets/lumiere/slide_01.jpg",
+      "/assets/lumiere/slide_02.jpg",
+    ],
+  },
 ];
+
+const TAG_CONFIG: Record<string, { color: string; bg: string; icon: React.ReactNode }> = {
+  COMPETITION: { color: "#00ff66", bg: "bg-[#00ff66]", icon: <Trophy className="w-3 h-3" /> },
+  "BRANCH GALA": { color: "#f59e0b", bg: "bg-amber-500", icon: <Sparkles className="w-3 h-3" /> },
+  WORKSHOP: { color: "#60a5fa", bg: "bg-blue-400", icon: <BookOpen className="w-3 h-3" /> },
+  CAREER: { color: "#a78bfa", bg: "bg-violet-400", icon: <Layers className="w-3 h-3" /> },
+  EVENT: { color: "#00ff66", bg: "bg-[#00ff66]", icon: <Calendar className="w-3 h-3" /> },
+};
+
+const tagCfg = (tag: string) => TAG_CONFIG[tag] || TAG_CONFIG["EVENT"];
 
 export const EventsPage: React.FC = () => {
   const [events, setEvents] = useState<EventData[]>(DEFAULT_EVENTS);
   const [activeFilter, setActiveFilter] = useState("ALL");
   const [selectedEvent, setSelectedEvent] = useState<EventData | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchEvents() {
@@ -81,47 +133,79 @@ export const EventsPage: React.FC = () => {
                 fullDescription: Array.isArray(e.fullDescription)
                   ? e.fullDescription
                   : typeof e.fullDescription === "string"
-                  ? JSON.parse(e.fullDescription)
+                  ? (() => { try { return JSON.parse(e.fullDescription); } catch { return [e.fullDescription]; } })()
                   : [e.shortDesc || e.description || ""],
                 slides: Array.isArray(e.slides) && e.slides.length > 0
                   ? e.slides.map((s: any) => (typeof s === "string" ? s : s.imageUrl))
-                  : [e.coverImage || "/assets/promptops/slide_01.jpg"],
+                  : [e.posterUrl || "/assets/promptops/slide_01.jpg"],
               }))
             );
           }
         }
-      } catch (err) {
-        console.warn("Using offline events fallback data");
+      } catch {
+        // use fallback
+      } finally {
+        setLoading(false);
       }
     }
     fetchEvents();
   }, []);
 
-  const filters = ["ALL", "COMPETITION", "BRANCH GALA", "WORKSHOP"];
+  const allTags = Array.from(new Set(events.map((e) => e.tag)));
+  const filters = ["ALL", ...allTags];
 
-  const filteredEvents = events.filter((e) => {
-    if (activeFilter === "ALL") return true;
-    return e.tag.toUpperCase() === activeFilter;
-  });
+  const filteredEvents = events.filter((e) =>
+    activeFilter === "ALL" ? true : e.tag.toUpperCase() === activeFilter
+  );
+
+  const [featuredEvent, ...restEvents] = filteredEvents;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <div className="text-center font-mono text-[#88aa90] text-xs space-y-3">
+          <div className="w-8 h-8 border-2 border-[#00ff66]/30 border-t-[#00ff66] rounded-full animate-spin mx-auto" />
+          <p>Loading events...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-7xl mx-auto px-6 md:px-12 py-12">
-      {/* Page Header */}
-      <div className="mb-12 text-center max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00ff66]/10 border border-[#00ff66]/30 text-[#00ff66] font-mono text-xs tracking-wider uppercase mb-4">
+    <div className="max-w-7xl mx-auto px-6 md:px-12 py-16">
+      {/* ── Page Header ─────────────────────────────────────────── */}
+      <div className="mb-14 text-center max-w-3xl mx-auto">
+        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#00ff66]/10 border border-[#00ff66]/30 text-[#00ff66] font-mono text-xs tracking-wider uppercase mb-5">
           <Calendar className="w-3.5 h-3.5" />
-          <span>Workshops &amp; Contests</span>
+          <span>Workshops & Contests</span>
         </div>
-        <h1 className="text-3xl md:text-5xl font-mono font-bold text-white mb-4 tracking-tight">
-          Events &amp; <span className="text-[#00ff66] text-glow">Workshops</span>
+        <h1 className="text-4xl md:text-5xl font-mono font-bold text-white mb-4 tracking-tight">
+          Events &amp;{" "}
+          <span className="text-[#00ff66]" style={{ textShadow: "0 0 20px rgba(0,255,102,0.5)" }}>
+            Workshops
+          </span>
         </h1>
-        <p className="font-mono text-xs md:text-sm text-[#88aa90] leading-relaxed">
-          From AI prompt engineering hackathons to formal department galas — explore the milestone gatherings hosted by the Cipher Student Association.
+        <p className="font-mono text-sm text-[#88aa90] leading-relaxed">
+          From AI prompt engineering hackathons to formal department galas — explore milestone gatherings hosted by the Cipher Student Association at SJEC.
         </p>
+
+        {/* Quick stats */}
+        <div className="flex items-center justify-center gap-8 mt-8">
+          {[
+            { label: "Total Events", value: events.length },
+            { label: "Competitions", value: events.filter((e) => e.tag === "COMPETITION").length },
+            { label: "Workshops", value: events.filter((e) => e.tag === "WORKSHOP").length },
+          ].map((s) => (
+            <div key={s.label} className="text-center">
+              <p className="font-mono text-2xl font-bold text-[#00ff66]">{s.value}</p>
+              <p className="font-mono text-xs text-[#88aa90] mt-0.5">{s.label}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div className="flex items-center justify-center gap-2 mb-10 pb-4 border-b border-[#00ff66]/15 overflow-x-auto scrollbar-none">
+      {/* ── Filter Tabs ──────────────────────────────────────────── */}
+      <div className="flex items-center justify-center gap-2 mb-12 pb-5 border-b border-[#00ff66]/15 overflow-x-auto scrollbar-none flex-wrap">
         <div className="flex items-center gap-1.5 mr-2 text-xs font-mono text-[#88aa90]">
           <Filter className="w-3.5 h-3.5 text-[#00ff66]" /> Filter:
         </div>
@@ -140,78 +224,140 @@ export const EventsPage: React.FC = () => {
         ))}
       </div>
 
-      {/* Events Showcase List */}
-      <div className="space-y-8">
-        {filteredEvents.map((event) => (
-          <div
-            key={event.id}
-            onClick={() => setSelectedEvent(event)}
-            className="group relative rounded-2xl bg-[#040e06] border border-[#00ff66]/20 hover:border-[#00ff66] transition-all duration-300 p-6 md:p-8 cursor-pointer hover:shadow-[0_0_30px_rgba(0,255,102,0.2)] hover:-translate-y-0.5 flex flex-col lg:flex-row gap-6 md:gap-8 items-start"
-          >
-            {/* Event Preview Thumbnail / Slide Count */}
-            <div className="relative w-full lg:w-96 h-60 rounded-xl overflow-hidden bg-[#020703] border border-[#00ff66]/25 flex-shrink-0">
-              <img
-                src={event.slides[0] || "/assets/promptops/slide_01.jpg"}
-                alt={event.title}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = "/assets/promptops/slide_01.jpg";
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+      {/* ── Featured Event (top/first) ───────────────────────────── */}
+      {featuredEvent && (
+        <div
+          onClick={() => setSelectedEvent(featuredEvent)}
+          className="group relative rounded-2xl overflow-hidden border border-[#00ff66]/25 hover:border-[#00ff66] transition-all duration-300 cursor-pointer hover:shadow-[0_0_40px_rgba(0,255,102,0.2)] mb-8"
+        >
+          {/* Background image */}
+          <div className="relative h-72 md:h-96 w-full overflow-hidden">
+            <img
+              src={featuredEvent.slides[0] || "/assets/promptops/slide_01.jpg"}
+              alt={featuredEvent.title}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              onError={(e) => { (e.target as HTMLImageElement).src = "/assets/promptops/slide_01.jpg"; }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
 
-              {/* Tag & Date Overlay */}
-              <div className="absolute top-3 left-3 px-2.5 py-1 rounded bg-[#00ff66] text-black font-mono text-[10px] font-bold uppercase tracking-wider">
-                {event.tag}
-              </div>
-
-              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-xs font-mono text-white">
-                <span className="flex items-center gap-1.5 text-[#00ff66]">
-                  <Calendar className="w-3.5 h-3.5" /> {event.dateTag}
-                </span>
-                <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-black/60 backdrop-blur border border-[#00ff66]/30 text-[11px]">
-                  <Images className="w-3 h-3 text-[#00ff66]" /> {event.slides.length} Slides
-                </span>
-              </div>
+            {/* FEATURED badge */}
+            <div className="absolute top-5 left-5 flex items-center gap-2">
+              <span className="px-2.5 py-1 rounded font-mono text-[10px] font-bold uppercase tracking-widest text-black"
+                style={{ background: tagCfg(featuredEvent.tag).color }}>
+                {featuredEvent.tag}
+              </span>
+              <span className="px-2.5 py-1 rounded bg-white/10 backdrop-blur border border-white/20 font-mono text-[10px] text-white tracking-wider">
+                FEATURED
+              </span>
             </div>
 
-            {/* Event Content Details */}
-            <div className="flex-1 flex flex-col justify-between self-stretch">
-              <div>
-                <span className="font-mono text-xs text-[#00ff66] tracking-widest uppercase block mb-1">
-                  {event.cardSub}
-                </span>
-                <h3 className="text-xl md:text-2xl font-mono font-bold text-white group-hover:text-[#00ff66] transition-colors">
-                  {event.title}
-                </h3>
-                <p className="font-mono text-xs text-[#88aa90] mt-3 leading-relaxed">
-                  {event.description}
-                </p>
-              </div>
+            {/* Slide count */}
+            <div className="absolute top-5 right-5 flex items-center gap-1 px-2.5 py-1 rounded bg-black/60 backdrop-blur border border-[#00ff66]/30 text-[11px] font-mono text-[#00ff66]">
+              <Images className="w-3.5 h-3.5" /> {featuredEvent.slides.length} Slides
+            </div>
 
-              {/* Action Button */}
-              <div className="pt-6 mt-6 border-t border-[#00ff66]/15 flex items-center justify-between">
-                <span className="font-mono text-xs text-[#88aa90] flex items-center gap-1.5">
+            {/* Content overlay */}
+            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+              <p className="font-mono text-xs text-[#00ff66] tracking-widest uppercase mb-2">{featuredEvent.cardSub}</p>
+              <h2 className="text-2xl md:text-4xl font-mono font-bold text-white group-hover:text-[#00ff66] transition-colors leading-tight mb-3">
+                {featuredEvent.title}
+              </h2>
+              <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 text-xs font-mono text-[#88aa90]">
+                <span className="flex items-center gap-1.5 text-[#00ff66]">
+                  <Calendar className="w-3.5 h-3.5" /> {featuredEvent.dateTag}
+                </span>
+                <span className="flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-[#00ff66]" /> St Joseph Engineering College
                 </span>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-2 font-mono text-xs font-bold text-[#00ff66] px-4 py-2 rounded-lg bg-[#00ff66]/10 border border-[#00ff66]/30 group-hover:bg-[#00ff66] group-hover:text-black transition-all"
-                >
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>Open Gallery</span>
-                </button>
+                <span className="hidden md:flex items-center gap-1.5 ml-auto text-[#00ff66] group-hover:translate-x-1 transition-transform">
+                  Open Gallery <ArrowRight className="w-4 h-4" />
+                </span>
               </div>
             </div>
           </div>
-        ))}
+        </div>
+      )}
+
+      {/* ── Events Grid ──────────────────────────────────────────── */}
+      {restEvents.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+          {restEvents.map((event) => (
+            <EventCard key={event.id} event={event} onSelect={setSelectedEvent} />
+          ))}
+        </div>
+      )}
+
+      {filteredEvents.length === 0 && (
+        <div className="text-center py-20 font-mono">
+          <p className="text-4xl mb-4">📅</p>
+          <p className="text-[#88aa90] text-sm">No events found for this category.</p>
+          <button onClick={() => setActiveFilter("ALL")} className="mt-4 text-[#00ff66] text-xs underline">
+            Show all events
+          </button>
+        </div>
+      )}
+
+      {/* Modal */}
+      <EventModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
+    </div>
+  );
+};
+
+// ── Event Card ────────────────────────────────────────────────────────────
+interface EventCardProps {
+  event: EventData;
+  onSelect: (e: EventData) => void;
+}
+
+const EventCard: React.FC<EventCardProps> = ({ event, onSelect }) => {
+  const cfg = tagCfg(event.tag);
+  return (
+    <div
+      onClick={() => onSelect(event)}
+      className="group relative rounded-2xl bg-[#040e06] border border-[#00ff66]/20 hover:border-[#00ff66] transition-all duration-300 overflow-hidden cursor-pointer hover:shadow-[0_0_25px_rgba(0,255,102,0.2)] hover:-translate-y-1.5 flex flex-col"
+    >
+      {/* Thumbnail */}
+      <div className="relative w-full h-44 overflow-hidden bg-[#020703]">
+        <img
+          src={event.slides[0] || "/assets/promptops/slide_01.jpg"}
+          alt={event.title}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          onError={(e) => { (e.target as HTMLImageElement).src = "/assets/promptops/slide_01.jpg"; }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#040e06] via-transparent to-transparent opacity-70" />
+
+        {/* Tag */}
+        <div className={`absolute top-3 left-3 flex items-center gap-1 px-2.5 py-1 rounded ${cfg.bg} text-black font-mono text-[9px] font-bold uppercase tracking-widest`}>
+          {cfg.icon} {event.tag}
+        </div>
+        {/* Slides */}
+        <div className="absolute bottom-3 right-3 flex items-center gap-1 px-2 py-0.5 rounded bg-black/60 backdrop-blur border border-[#00ff66]/30 text-[10px] font-mono text-[#00ff66]">
+          <Images className="w-3 h-3" /> {event.slides.length}
+        </div>
       </div>
 
-      {/* Interactive Modal Slider */}
-      <EventModal
-        event={selectedEvent}
-        onClose={() => setSelectedEvent(null)}
-      />
+      {/* Content */}
+      <div className="p-5 flex-1 flex flex-col">
+        <div className="flex items-center gap-1.5 text-[10px] font-mono text-[#00ff66] tracking-widest uppercase mb-2">
+          <Calendar className="w-3 h-3" /> {event.dateTag}
+        </div>
+        <h3 className="font-mono text-base font-bold text-white group-hover:text-[#00ff66] transition-colors leading-snug mb-2">
+          {event.title}
+        </h3>
+        <p className="font-mono text-[11px] text-[#88aa90] leading-relaxed line-clamp-2 flex-1">
+          {event.description}
+        </p>
+
+        <div className="mt-4 pt-4 border-t border-[#00ff66]/10 flex items-center justify-between">
+          <span className="font-mono text-[10px] text-[#88aa90] flex items-center gap-1">
+            <MapPin className="w-3 h-3 text-[#00ff66]" /> SJEC
+          </span>
+          <span className="flex items-center gap-1 text-[10px] font-mono text-[#00ff66] group-hover:translate-x-0.5 transition-transform">
+            Gallery <ArrowRight className="w-3 h-3" />
+          </span>
+        </div>
+      </div>
     </div>
   );
 };

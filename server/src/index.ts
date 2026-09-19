@@ -17,6 +17,8 @@ import activitiesRoutes from "./routes/activities.routes.js";
 import domainsRoutes from "./routes/domains.routes.js";
 import contentRoutes from "./routes/content.routes.js";
 import mediaRoutes from "./routes/media.routes.js";
+import blogRoutes from "./routes/blog.routes.js";
+
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -85,6 +87,8 @@ app.use("/api/admin/activities", activitiesRoutes);
 app.use("/api/admin/domains", domainsRoutes);
 app.use("/api/admin/content", contentRoutes);
 app.use("/api/admin/media", mediaRoutes);
+app.use("/api", blogRoutes); // handles /api/public/blog and /api/admin/blog
+
 
 // Global Error Handler
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {

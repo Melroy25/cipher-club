@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -7,6 +7,7 @@ import {
   Calendar,
   Layers,
   Globe2,
+  BookOpen,
   FileText,
   Image as ImageIcon,
   Settings,
@@ -37,6 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     { to: "/admin/events", label: "Events & Workshops", icon: Calendar },
     { to: "/admin/activities", label: "Activities", icon: Layers },
     { to: "/admin/domains", label: "Domains", icon: Globe2 },
+    { to: "/admin/blog", label: "Blog Posts", icon: BookOpen },
     { to: "/admin/content", label: "Website Content", icon: FileText },
     { to: "/admin/media", label: "Media Library", icon: ImageIcon },
     { to: "/admin/settings", label: "Settings", icon: Settings },

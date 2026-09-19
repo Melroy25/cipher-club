@@ -126,6 +126,24 @@ model SiteContent {
   updatedAt DateTime @updatedAt
 }
 
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  category    String   @default("GENERAL")
+  summary     String
+  content     String   @default("[]") // JSON array of paragraph strings
+  coverImage  String?
+  author      String   @default("Cipher Team")
+  authorRole  String   @default("Cipher Core")
+  readTime    String   @default("3 MIN READ")
+  publishedAt DateTime @default(now())
+  displayOrder Int     @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model MediaAsset {
   id        String   @id @default(cuid())
   url       String

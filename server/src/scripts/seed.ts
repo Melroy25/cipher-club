@@ -207,6 +207,87 @@ async function main() {
     });
   }
 
+  // 6. Blog Posts
+  const existingPosts = await prisma.blogPost.count();
+  if (existingPosts === 0) {
+    console.log("Seeding blog posts...");
+    const samplePosts = [
+      {
+        title: "Inside PROMPT OPS-2K26: How We Built an Adversarial Gemini AI Prompt Challenge",
+        slug: "inside-prompt-ops-2k26",
+        category: "AI & PROMPTS",
+        readTime: "4 MIN READ",
+        author: "Technical Committee",
+        authorRole: "Cipher Core",
+        coverImage: "/assets/promptops/slide_01.jpg",
+        summary: "A deep dive into how Cipher and AgentBlazer created real-world prompt extraction testbeds, JSON transformation challenges, and Python debugging rounds for CSE students.",
+        content: JSON.stringify([
+          "On March 25, 2026, Kalam Auditorium saw over 120 students compete in PROMPT OPS-2K26. Rather than conventional coding rounds, this competition treated language models as runtime environments requiring adversarial testing, structured output extraction, and guardrail navigation.",
+          "Track 1 tested foundational image and visual generation prompting. Participants were provided intricate technical diagrams and had to reconstruct high-fidelity vectors and banners through iterative prompt refinement.",
+          "Track 2 introduced system-prompt extraction and JSON normalization under constraint. Contestants were presented with hardened LLM endpoints and had to extract secret keys while verifying schema compliance through automated Python unit tests.",
+          "The competition demonstrated that prompt engineering in 2026 is no longer about guessing adjectives—it is about deterministic structured input/output design, API schema adherence, and security awareness."
+        ]),
+        displayOrder: 1,
+        isPublished: true,
+      },
+      {
+        title: "From Zero to Solidity: What We Covered in the Smart Contract Workshop",
+        slug: "from-zero-to-solidity-workshop",
+        category: "BLOCKCHAIN",
+        readTime: "5 MIN READ",
+        author: "Domain Leads",
+        authorRole: "Technical Domain",
+        coverImage: "/assets/lumiere/slide_01.jpg",
+        summary: "Key takeaways from our hands-on Solidity workshop: EVM architecture, gas optimization, smart contract state variables, and deploying on Sepolia testnets.",
+        content: JSON.stringify([
+          "Decentralized systems remain one of the most intellectually rewarding paradigms for software engineers. In Session 14 of Cipher's Technical Domain track, we hosted an intensive Solidity and Web3 developer crash course.",
+          "We started with the Ethereum Virtual Machine (EVM) stack model, memory vs storage vs calldata, and why gas optimization matters when deploying production code.",
+          "Students created their own ERC-20 token contract, wrote automated test suites with Hardhat, and successfully broadcasted deployment transactions to the Sepolia testnet.",
+          "Code repositories and deployment guides are available on the Cipher GitHub organization for all club members."
+        ]),
+        displayOrder: 2,
+        isPublished: true,
+      },
+      {
+        title: "Cracking Technical Interviews: Lessons from the UDAAN Mock Drives",
+        slug: "cracking-technical-interviews-udaan",
+        category: "CAREERS",
+        readTime: "6 MIN READ",
+        author: "Senior Council",
+        authorRole: "Cipher Alumni",
+        summary: "Insights from senior CSE students and alumni on data structures, system design fundamentals, resume curation, and navigating high-pressure technical interviews.",
+        content: JSON.stringify([
+          "The UDAAN Mock Interview initiative was established to simulate real-world campus recruitment and off-campus tech evaluations.",
+          "Through three rigorous rounds—DSA problem solving, system architecture discussions, and HR behavioral screenings—candidates received real-time constructive feedback from seniors placed in top product companies.",
+          "Key takeaway 1: Communicate thought processes before writing code. Interviewers prioritize how you formulate constraints and edge cases.",
+          "Key takeaway 2: Deep fundamentals in operating systems, DBMS indexing, and networking protocols matter far more than buzzwords on resumes."
+        ]),
+        displayOrder: 3,
+        isPublished: true,
+      },
+      {
+        title: "Modern Research Tooling: Accelerating Academic Paper Reviews with AI",
+        slug: "modern-research-tooling-ai",
+        category: "RESEARCH",
+        readTime: "3 MIN READ",
+        author: "Faculty Advisory",
+        authorRole: "CSE Department",
+        summary: "How CSE undergraduate researchers can leverage LaTeX, citation graphing, and semantic search tools to organize literature reviews without sacrificing academic integrity.",
+        content: JSON.stringify([
+          "Academic publishing demands rigorous synthesis of related work. During Session 13, the department reviewed modern literature review tools and reproducible experimentation pipelines.",
+          "We highlighted the proper usage of LaTeX for IEEE format typesetting, reference indexing with BibTeX, and semantic paper clustering.",
+          "Advisory reminder: AI assistants are aids for summarizing and formatting, but empirical validation and peer review standards remain paramount."
+        ]),
+        displayOrder: 4,
+        isPublished: true,
+      }
+    ];
+
+    for (const post of samplePosts) {
+      await prisma.blogPost.create({ data: post });
+    }
+  }
+
   console.log("Seeding completed successfully!");
 }
 

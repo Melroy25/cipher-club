@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext.tsx';
 import { CipherParticleText } from './CipherParticleText.tsx';
@@ -9,6 +9,8 @@ interface HeroProps {
 }
 
 export const Hero: React.FC<HeroProps> = ({ onOpenJoinModal, onOpenRootAccess }) => {
+  const heroRef = useRef<HTMLElement>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   const [subtitle, setSubtitle] = useState(
     "Bridging academic knowledge and practical application – a community of aspiring professionals in computing."
@@ -34,14 +36,21 @@ export const Hero: React.FC<HeroProps> = ({ onOpenJoinModal, onOpenRootAccess })
   }, []);
 
   return (
-    <section id="home" className="relative pt-20 sm:pt-24 md:pt-28 pb-8 sm:pb-12 flex flex-col justify-center overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full relative z-10">
+    <section
+      ref={heroRef}
+      id="home"
+      className="relative pt-20 sm:pt-24 md:pt-28 pb-8 sm:pb-12 flex flex-col justify-center overflow-hidden"
+    >
+      {/* Full-Hero Interactive Digital Particle Environment */}
+      <CipherParticleText heroRef={heroRef} anchorRef={anchorRef} />
+
+      <div className="max-w-7xl mx-auto px-6 md:px-12 w-full relative z-10 pointer-events-auto">
         
-        {/* Interactive Digital Particle Typography for "CIPHER" */}
-        <CipherParticleText />
+        {/* Visual Anchor for CIPHER Wordmark Typography */}
+        <div ref={anchorRef} className="w-full h-20 sm:h-28 md:h-32 mb-1 sm:mb-2 select-none" />
 
         {/* Hero Typography & Headings */}
-        <div className="mt-3 sm:mt-4 max-w-3xl">
+        <div className="max-w-3xl">
           <h1
             className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight leading-tight font-sans text-black dark:text-white"
             style={{ color: theme === "dark" ? "#ffffff" : "#000000" }}

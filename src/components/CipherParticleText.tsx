@@ -8,6 +8,8 @@ interface Particle {
   originY: number;
   vx: number;
   vy: number;
+  baseVx: number;
+  baseVy: number;
   returnSpeed: number;
   friction: number;
   blastMultiplier: number;
@@ -17,12 +19,18 @@ interface Particle {
   ambientPhase: number;
   ambientSpeed: number;
   isHighlight: boolean;
+  isText: boolean;
+}
+
+interface CipherParticleTextProps {
+  heroRef: React.RefObject<HTMLElement | null>;
+  anchorRef: React.RefObject<HTMLDivElement | null>;
 }
 
 const MATRIX_CHARS = 'CIPHER0123456789#%*+=:;.-@_[]';
+const AMBIENT_CHARS = ['·', '▪', '.', '+', '0', '1', '*', ':', '~'];
 
-export const CipherParticleText: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
+export const CipherParticleText: React.FC<CipherParticleTextProps> = ({ heroRef, anchorRef }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const { theme } = useTheme();
   const themeRef = useRef(theme);
@@ -32,9 +40,10 @@ export const CipherParticleText: React.FC = () => {
   }, [theme]);
 
   useEffect(() => {
-    const container = containerRef.current;
+    const heroEl = heroRef.current;
+    const anchorEl = anchorRef.current;
     const canvas = canvasRef.current;
-    if (!container || !canvas) return;
+    if (!heroEl || !anchorEl || !canvas) return;
 
     const ctx = canvas.getContext('2d', { willReadFrequently: true });
     if (!ctx) return;
@@ -42,11 +51,11 @@ export const CipherParticleText: React.FC = () => {
     let animationFrameId: number;
     let particles: Particle[] = [];
 
-    // Pointer state with physical repulsion radius
+    // Pointer state across the full hero environment
     const mouse = {
       x: -9999,
       y: -9999,
-      radius: 120,
+      radius: 125,
       active: false,
     };
 
@@ -56,42 +65,57 @@ export const CipherParticleText: React.FC = () => {
           primary: ['#00ff66', '#00ff66', '#38ef7d', '#00e65b', '#10b981'],
           deep: ['#00cc55', '#00aa44', '#047857'],
           sparkle: ['#ffffff', '#e0ffe8', '#a8ffc4'],
+          ambient: ['rgba(0, 255, 102, 0.65)', 'rgba(0, 255, 102, 0.4)', 'rgba(56, 239, 125, 0.55)', 'rgba(0, 204, 85, 0.35)'],
         };
       } else {
         return {
           primary: ['#059669', '#047857', '#065f46'],
           deep: ['#0f766e', '#115e59'],
           sparkle: ['#10b981', '#34d399', '#059669'],
+          ambient: ['rgba(5, 150, 105, 0.55)', 'rgba(5, 150, 105, 0.35)', 'rgba(16, 185, 129, 0.45)'],
         };
       }
     };
 
-    // Build dense text mask and sample particles
-    const initParticles = () => {
-      const rect = container.getBoundingClientRect();
-      const width = Math.floor(rect.width);
-      if (width <= 0) return;
+    // Initialize full-hero particle environment
+    const initEnvironment = () => {
+      const heroRect = heroEl.getBoundingClientRect();
+      const anchorRect = anchorEl.getBoundingClientRect();
 
-      // Tight, responsive canvas height to eliminate vertical gaps
-      const isMobile = width < 640;
-      const isTablet = width < 1024;
-      const height = isMobile ? 95 : isTablet ? 125 : 150;
+      const width = Math.floor(heroRect.width);
+      const height = Math.floor(heroRect.height);
+      if (width <= 0 || height <= 0) return;
 
-      canvas.width = width;
-      canvas.height = height;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
       // Mouse influence radius scales with screen size
-      mouse.radius = Math.min(Math.max(width * 0.12, 85), 135);
+      mouse.radius = Math.min(Math.max(width * 0.12, 95), 145);
 
-      // Offscreen canvas to rasterize ultra-bold "CIPHER" text
+      // Relative coordinates of the CIPHER text anchor inside the hero section
+      const targetX = Math.max(0, anchorRect.left - heroRect.left);
+      const targetY = Math.max(0, anchorRect.top - heroRect.top);
+      const targetWidth = Math.max(200, anchorRect.width);
+      const targetHeight = Math.max(60, anchorRect.height);
+
+      // Offscreen canvas for sampling high-density CIPHER text mask
       const offscreen = document.createElement('canvas');
       offscreen.width = width;
       offscreen.height = height;
       const offCtx = offscreen.getContext('2d', { willReadFrequently: true });
       if (!offCtx) return;
 
-      // Use a bold font with strong monospace/geometric letterforms
-      const fontSize = Math.floor(Math.min(width / (isMobile ? 6.2 : 6.8), height * 0.88));
+      const isMobile = width < 640;
+      const fontSize = Math.floor(
+        Math.min(targetWidth / (isMobile ? 6.2 : 6.8), targetHeight * 0.96)
+      );
+
+      // Ultra-bold monospace font for strong matrix letterforms
       offCtx.font = `900 ${fontSize}px "JetBrains Mono", "Space Grotesk", monospace`;
       offCtx.fillStyle = '#ffffff';
       offCtx.strokeStyle = '#ffffff';
@@ -103,10 +127,10 @@ export const CipherParticleText: React.FC = () => {
       const totalLetters = letters.length;
       
       // Calculate balanced span and spacing
-      const totalSpan = Math.min(width * 0.95, 1150);
+      const totalSpan = Math.min(targetWidth * 0.96, 1150);
       const letterSpacing = totalSpan / totalLetters;
-      const startX = (width - (totalLetters - 1) * letterSpacing) / 2;
-      const centerY = height / 2;
+      const startX = targetX + (targetWidth - (totalLetters - 1) * letterSpacing) / 2;
+      const centerY = targetY + targetHeight / 2;
 
       // Draw stroke and fill so letter strokes have solid, bold body
       letters.forEach((letter, i) => {
@@ -115,22 +139,22 @@ export const CipherParticleText: React.FC = () => {
         offCtx.fillText(letter, x, centerY);
       });
 
-      // Sample pixels on a high-density grid
+      // Sample pixels on a dense grid
       const imgData = offCtx.getImageData(0, 0, width, height);
       const data = imgData.data;
-      const step = isMobile ? 5 : 4; // Dense sampling step
+      const step = isMobile ? 5 : 4; // High density step
       const isDark = themeRef.current === 'dark';
       const palette = getPalette(isDark);
 
       const newParticles: Particle[] = [];
 
-      for (let y = 0; y < height; y += step) {
-        for (let x = 0; x < width; x += step) {
+      // 1. Text Particles (CIPHER Wordmark)
+      for (let y = Math.max(0, Math.floor(targetY - 10)); y < Math.min(height, Math.ceil(targetY + targetHeight + 10)); y += step) {
+        for (let x = Math.max(0, Math.floor(targetX - 10)); x < Math.min(width, Math.ceil(targetX + targetWidth + 10)); x += step) {
           const index = (y * width + x) * 4;
           const alpha = data[index + 3];
 
-          // Sample visible pixels from the text mask
-          if (alpha > 80) {
+          if (alpha > 75) {
             const rand = Math.random();
             let color = palette.primary[Math.floor(Math.random() * palette.primary.length)];
             let isHighlight = false;
@@ -152,45 +176,82 @@ export const CipherParticleText: React.FC = () => {
               originY: y,
               vx: 0,
               vy: 0,
-              returnSpeed: 0.08 + Math.random() * 0.04, // Smooth spring return
-              friction: 0.86 + Math.random() * 0.03, // Dampening for glide
-              blastMultiplier: 32 + Math.random() * 22, // Powerful repulsion
+              baseVx: 0,
+              baseVy: 0,
+              returnSpeed: 0.08 + Math.random() * 0.04,
+              friction: 0.88 + Math.random() * 0.03,
+              blastMultiplier: 38 + Math.random() * 24,
               char,
               size: particleSize,
               color,
               ambientPhase: Math.random() * Math.PI * 2,
               ambientSpeed: 0.015 + Math.random() * 0.02,
               isHighlight,
+              isText: true,
             });
           }
         }
       }
 
+      // 2. Second Layer: Ambient Digital Dust Across Full Hero Background
+      const ambientCount = Math.floor(Math.min((width * height) / 3800, 240));
+
+      for (let i = 0; i < ambientCount; i++) {
+        const ax = Math.random() * width;
+        const ay = Math.random() * height;
+        const driftX = (Math.random() - 0.5) * 0.45;
+        const driftY = (Math.random() - 0.5) * 0.35;
+        const aColor = palette.ambient[Math.floor(Math.random() * palette.ambient.length)];
+        const aChar = AMBIENT_CHARS[Math.floor(Math.random() * AMBIENT_CHARS.length)];
+        const aSize = Math.random() > 0.6 ? 7 : 5;
+
+        newParticles.push({
+          x: ax,
+          y: ay,
+          originX: ax,
+          originY: ay,
+          vx: driftX,
+          vy: driftY,
+          baseVx: driftX,
+          baseVy: driftY,
+          returnSpeed: 0.02,
+          friction: 0.92,
+          blastMultiplier: 28 + Math.random() * 18,
+          char: aChar,
+          size: aSize,
+          color: aColor,
+          ambientPhase: Math.random() * Math.PI * 2,
+          ambientSpeed: 0.01 + Math.random() * 0.015,
+          isHighlight: false,
+          isText: false,
+        });
+      }
+
       particles = newParticles;
     };
 
-    // Ensure web fonts are completely ready before rasterizing
+    // Ensure fonts are loaded before initial sampling
     if (document.fonts && document.fonts.ready) {
       document.fonts.ready.then(() => {
-        initParticles();
+        initEnvironment();
       });
     } else {
-      initParticles();
+      initEnvironment();
     }
 
-    // Pointer interaction handling with coordinate normalization
+    // Pointer Interaction Across Full Hero
     const updatePointer = (clientX: number, clientY: number) => {
-      const rect = canvas.getBoundingClientRect();
-      const pad = 60; // Influence buffer around canvas
-      const isInside =
+      const rect = heroEl.getBoundingClientRect();
+      const pad = 50;
+
+      if (
         clientX >= rect.left - pad &&
         clientX <= rect.right + pad &&
         clientY >= rect.top - pad &&
-        clientY <= rect.bottom + pad;
-
-      if (isInside && rect.width > 0 && rect.height > 0) {
-        mouse.x = (clientX - rect.left) * (canvas.width / rect.width);
-        mouse.y = (clientY - rect.top) * (canvas.height / rect.height);
+        clientY <= rect.bottom + pad
+      ) {
+        mouse.x = (clientX - rect.left) * (canvas.clientWidth / rect.width);
+        mouse.y = (clientY - rect.top) * (canvas.clientHeight / rect.height);
         mouse.active = true;
       } else {
         mouse.active = false;
@@ -199,11 +260,11 @@ export const CipherParticleText: React.FC = () => {
       }
     };
 
-    const handlePointerMove = (e: MouseEvent) => {
+    const handleMouseMove = (e: MouseEvent) => {
       updatePointer(e.clientX, e.clientY);
     };
 
-    const handlePointerLeave = () => {
+    const handleMouseLeave = () => {
       mouse.active = false;
       mouse.x = -9999;
       mouse.y = -9999;
@@ -216,32 +277,28 @@ export const CipherParticleText: React.FC = () => {
     };
 
     const handleTouchEnd = () => {
-      handlePointerLeave();
+      handleMouseLeave();
     };
 
-    // Direct canvas event listeners
-    canvas.addEventListener('mousemove', handlePointerMove);
-    canvas.addEventListener('mouseleave', handlePointerLeave);
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: true });
-    canvas.addEventListener('touchend', handleTouchEnd);
-    canvas.addEventListener('touchcancel', handleTouchEnd);
+    window.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('blur', handleMouseLeave);
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd);
+    window.addEventListener('touchcancel', handleTouchEnd);
 
-    // Global window listeners so rapid cursor sweeps are smoothly caught
-    window.addEventListener('mousemove', handlePointerMove);
-    document.addEventListener('mouseleave', handlePointerLeave);
-    window.addEventListener('blur', handlePointerLeave);
-
-    // Responsive scaling
+    // Resize Observer on Hero section and Anchor
     const resizeObserver = new ResizeObserver(() => {
-      initParticles();
+      initEnvironment();
     });
-    resizeObserver.observe(container);
+    resizeObserver.observe(heroEl);
+    resizeObserver.observe(anchorEl);
 
-    // Continuous 60FPS physics and render loop
+    // 60FPS Physics & Render Loop
     const render = () => {
       const isDark = themeRef.current === 'dark';
-      const width = canvas.width;
-      const height = canvas.height;
+      const width = canvas.clientWidth;
+      const height = canvas.clientHeight;
 
       ctx.clearRect(0, 0, width, height);
 
@@ -258,7 +315,7 @@ export const CipherParticleText: React.FC = () => {
       for (let i = 0; i < particles.length; i++) {
         const p = particles[i];
 
-        // 1. Physical Mouse Repulsion (Digital Dust Dispersion)
+        // 1. Mouse Repulsion Across Full Hero (Digital Dust Dispersion)
         if (mouseActive) {
           const dx = p.x - mouseX; // Vector pointing AWAY from cursor
           const dy = p.y - mouseY;
@@ -270,41 +327,62 @@ export const CipherParticleText: React.FC = () => {
             const normX = dx / dist;
             const normY = dy / dist;
 
-            // Physical explosive blast
+            // Physical blast force
             const impulse = force * force * p.blastMultiplier;
             p.vx += normX * impulse;
             p.vy += normY * impulse;
 
-            // Digital dust turbulence
+            // Turbulence noise
             p.vx += (Math.random() - 0.5) * 4 * force;
             p.vy += (Math.random() - 0.5) * 4 * force;
           }
         }
 
-        // 2. Returning Spring & Friction Physics
-        p.vx *= p.friction;
-        p.vy *= p.friction;
-        p.x += p.vx + (p.originX - p.x) * p.returnSpeed;
-        p.y += p.vy + (p.originY - p.y) * p.returnSpeed;
-
-        // 3. Subtle Ambient Shimmer when Settled (Alive Feeling)
         let drawX = p.x;
         let drawY = p.y;
-        const distFromHome = Math.abs(p.originX - p.x) + Math.abs(p.originY - p.y);
         const speed = Math.abs(p.vx) + Math.abs(p.vy);
 
-        if (distFromHome < 1.5 && speed < 0.25) {
-          p.ambientPhase += p.ambientSpeed;
-          drawX += Math.sin(p.ambientPhase) * 0.35;
-          drawY += Math.cos(p.ambientPhase * 0.8) * 0.35;
+        if (p.isText) {
+          // Text particles: Spring return to origin
+          p.vx *= p.friction;
+          p.vy *= p.friction;
+          p.x += p.vx + (p.originX - p.x) * p.returnSpeed;
+          p.y += p.vy + (p.originY - p.y) * p.returnSpeed;
+
+          // Subtle ambient breathing when settled
+          const distFromHome = Math.abs(p.originX - p.x) + Math.abs(p.originY - p.y);
+          if (distFromHome < 1.5 && speed < 0.25) {
+            p.ambientPhase += p.ambientSpeed;
+            drawX += Math.sin(p.ambientPhase) * 0.35;
+            drawY += Math.cos(p.ambientPhase * 0.8) * 0.35;
+          }
+
+          // Matrix character periodic shimmer
+          if (Math.random() < 0.003) {
+            p.char = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
+          }
+        } else {
+          // Ambient background particles: Natural floating drift
+          p.vx *= p.friction;
+          p.vy *= p.friction;
+          p.x += p.vx;
+          p.y += p.vy;
+
+          // Seamless wrap around hero edges
+          if (p.x < -30) p.x = width + 30;
+          if (p.x > width + 30) p.x = -30;
+          if (p.y < -30) p.y = height + 30;
+          if (p.y > height + 30) p.y = -30;
+
+          // Gradually resume baseline drift
+          p.vx += (p.baseVx - p.vx) * 0.02;
+          p.vy += (p.baseVy - p.vy) * 0.02;
+
+          drawX = p.x;
+          drawY = p.y;
         }
 
-        // Periodic matrix character flip
-        if (Math.random() < 0.003) {
-          p.char = MATRIX_CHARS[Math.floor(Math.random() * MATRIX_CHARS.length)];
-        }
-
-        // 4. Glow styling & Draw
+        // Glow effects
         if (isDark && (p.isHighlight || speed > 1.8)) {
           ctx.shadowBlur = 8;
           ctx.shadowColor = '#00ff66';
@@ -322,29 +400,21 @@ export const CipherParticleText: React.FC = () => {
     render();
 
     return () => {
-      canvas.removeEventListener('mousemove', handlePointerMove);
-      canvas.removeEventListener('mouseleave', handlePointerLeave);
-      canvas.removeEventListener('touchmove', handleTouchMove);
-      canvas.removeEventListener('touchend', handleTouchEnd);
-      canvas.removeEventListener('touchcancel', handleTouchEnd);
-      window.removeEventListener('mousemove', handlePointerMove);
-      document.removeEventListener('mouseleave', handlePointerLeave);
-      window.removeEventListener('blur', handlePointerLeave);
+      window.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      window.removeEventListener('blur', handleMouseLeave);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('touchcancel', handleTouchEnd);
       resizeObserver.disconnect();
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [heroRef, anchorRef]);
 
   return (
-    <div
-      ref={containerRef}
-      className="w-full relative select-none leading-none block"
-      style={{ touchAction: 'pan-y' }}
-    >
-      <canvas
-        ref={canvasRef}
-        className="w-full block relative z-20 cursor-crosshair pointer-events-auto"
-      />
-    </div>
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none z-0 block"
+    />
   );
 };

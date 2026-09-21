@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext.tsx';
 import { CipherParticleText } from './CipherParticleText.tsx';
@@ -9,8 +9,6 @@ interface HeroProps {
 }
 
 export const Hero: React.FC<HeroProps> = ({ onOpenJoinModal, onOpenRootAccess }) => {
-  const heroRef = useRef<HTMLElement>(null);
-  const anchorRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   const [subtitle, setSubtitle] = useState(
     "Bridging academic knowledge and practical application – a community of aspiring professionals in computing."
@@ -37,17 +35,15 @@ export const Hero: React.FC<HeroProps> = ({ onOpenJoinModal, onOpenRootAccess })
 
   return (
     <section
-      ref={heroRef}
       id="home"
       className="relative pt-20 sm:pt-24 md:pt-28 pb-8 sm:pb-12 flex flex-col justify-center overflow-hidden"
     >
-      {/* Full-Hero Interactive Digital Particle Environment */}
-      <CipherParticleText heroRef={heroRef} anchorRef={anchorRef} />
-
       <div className="max-w-7xl mx-auto px-6 md:px-12 w-full relative z-10 pointer-events-auto">
         
-        {/* Visual Anchor for CIPHER Wordmark Typography */}
-        <div ref={anchorRef} className="w-full h-20 sm:h-28 md:h-32 mb-1 sm:mb-2 select-none" />
+        {/* Animated Digital Character CIPHER Wordmark */}
+        <div className="w-full h-24 sm:h-32 md:h-40 mb-2 sm:mb-3 select-none relative">
+          <CipherParticleText />
+        </div>
 
         {/* Hero Typography & Headings */}
         <div className="max-w-3xl">

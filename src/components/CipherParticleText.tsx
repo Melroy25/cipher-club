@@ -85,12 +85,12 @@ export const CipherParticleText: React.FC = () => {
       particles.length = 0;
       offCtx.clearRect(0, 0, width, height);
 
-      // Desktop target: noticeably bigger letters ~195-215px height to fill red outline
-      const targetHeight = Math.min(height * 0.82, 215);
-      // Ensure on narrow screens it scales down proportionally
-      const maxPossibleWidth = width - 36;
-      const scale = Math.min(1, maxPossibleWidth / 880);
-      const fontSize = Math.max(54, Math.round(targetHeight * scale));
+      // Desktop target: noticeably taller letters ~210-235px height to fill red outline
+      const targetLetterHeight = Math.min(height * 0.86, 235);
+      const maxPossibleWidth = width - 32;
+
+      // Font size determines vertical letter height
+      const fontSize = Math.max(54, Math.round(targetLetterHeight));
 
       // Ultra-heavy, bold headline font so letter strokes are thick, fat, and chunky
       offCtx.font = `900 ${fontSize}px "Arial Black", Impact, "Segoe UI Black", "Inter", sans-serif`;
@@ -103,11 +103,21 @@ export const CipherParticleText: React.FC = () => {
       const sumWidths = letterWidths.reduce((sum, val) => sum + val, 0);
 
       // Close, tight spacing between letters as shown in reference pic (media_1790010540024.png)
-      const letterGap = Math.max(9, Math.round(fontSize * 0.105));
+      const letterGap = Math.max(8, Math.round(fontSize * 0.095));
+      const naturalTotalWidth = sumWidths + letterGap * (letters.length - 1);
 
-      const actualTotalWidth = sumWidths + letterGap * (letters.length - 1);
-      let currentX = (width - actualTotalWidth) / 2;
+      // Proportional width scaling if total width exceeds available viewport on mobile
+      const widthScale = naturalTotalWidth > maxPossibleWidth ? maxPossibleWidth / naturalTotalWidth : 1;
+
+      let currentX = (width - naturalTotalWidth * widthScale) / 2;
       const centerY = height / 2;
+
+      offCtx.save();
+      if (widthScale < 1) {
+        offCtx.translate(currentX, 0);
+        offCtx.scale(widthScale, 1);
+        currentX = 0;
+      }
 
       letters.forEach((letter, index) => {
         const letterWidth = letterWidths[index];
@@ -118,15 +128,16 @@ export const CipherParticleText: React.FC = () => {
 
         currentX += letterWidth + letterGap;
       });
+      offCtx.restore();
 
       const image = offCtx.getImageData(0, 0, Math.round(width), Math.round(height));
       const data = image.data;
 
       // Structured matrix grid intervals matching Image 2 (media_1790010843928.png):
       // Clean columns and rows with dark breathing room so characters are not crammed together
-      const stepY = Math.max(9, Math.round(fontSize / 16.5)); // ~10-11px vertical step
-      const stepX = Math.max(7.5, Math.round(fontSize / 19.5)); // ~8.5-9px horizontal step
-      const charSize = Math.max(6.5, Math.round(stepY * 0.78)); // ~8px crisp font size
+      const stepY = Math.max(9.5, Math.round(fontSize / 17)); // ~13-14px vertical step
+      const stepX = Math.max(7.5, Math.round(fontSize / 20.5)); // ~11-12px horizontal step
+      const charSize = Math.max(7, Math.round(stepY * 0.78)); // ~10px crisp font size
 
       const startY = (height % stepY) / 2 + stepY / 2;
       const startX = (width % stepX) / 2 + stepX / 2;

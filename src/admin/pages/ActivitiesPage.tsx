@@ -1,7 +1,8 @@
-﻿import React, { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Search, Eye, EyeOff, Loader2, Layers } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Plus, Edit2, Trash2, Search, Eye, EyeOff, Loader2, Layers, Image as ImageIcon, X, Calendar } from "lucide-react";
 import { Modal } from "../components/Modal.tsx";
 import { ConfirmDialog } from "../components/ConfirmDialog.tsx";
+import { ImageUploader } from "../components/ImageUploader.tsx";
 import { useToast } from "../context/ToastContext.tsx";
 
 interface Activity {
@@ -28,10 +29,14 @@ export const ActivitiesPage: React.FC = () => {
   const [formData, setFormData] = useState({
     numberId: "",
     title: "",
+    date: "",
     description: "",
+    photos: [] as string[],
     displayOrder: 0,
     isPublished: true,
   });
+
+  const [newPhotoUrl, setNewPhotoUrl] = useState("");
 
   const { success, error } = useToast();
 
@@ -60,23 +65,47 @@ export const ActivitiesPage: React.FC = () => {
     setFormData({
       numberId: nextNum,
       title: "",
+      date: "",
       description: "",
+      photos: [],
       displayOrder: activities.length + 1,
       isPublished: true,
     });
+    setNewPhotoUrl("");
     setIsModalOpen(true);
   };
 
   const openEditModal = (act: Activity) => {
     setEditingActivity(act);
+    let parsedPhotos: string[] = [];
+    if (act.photoUrl) {
+      try {
+        const parsed = JSON.parse(act.photoUrl);
+        if (Array.isArray(parsed)) parsedPhotos = parsed.filter(Boolean);
+        else if (typeof act.photoUrl === "string" && act.photoUrl.trim()) parsedPhotos = [act.photoUrl.trim()];
+      } catch {
+        if (typeof act.photoUrl === "string" && act.photoUrl.trim()) parsedPhotos = [act.photoUrl.trim()];
+      }
+    }
+
     setFormData({
       numberId: act.numberId || "",
       title: act.title,
+      date: act.date || "",
       description: act.description || "",
+      photos: parsedPhotos,
       displayOrder: act.displayOrder,
       isPublished: act.isPublished,
     });
+    setNewPhotoUrl("");
     setIsModalOpen(true);
+  };
+
+  const removePhoto = (idx: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      photos: prev.photos.filter((_, i) => i !== idx),
+    }));
   };
 
   const handleSave = async (e: React.FormEvent) => {
@@ -93,11 +122,23 @@ export const ActivitiesPage: React.FC = () => {
         : "/api/admin/activities";
       const method = editingActivity ? "PUT" : "POST";
 
+      const photoPayload = formData.photos.length > 0 ? JSON.stringify(formData.photos) : null;
+
+      const payload = {
+        numberId: formData.numberId,
+        title: formData.title,
+        date: formData.date,
+        description: formData.description,
+        photoUrl: photoPayload,
+        displayOrder: formData.displayOrder,
+        isPublished: formData.isPublished,
+      };
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -210,53 +251,91 @@ export const ActivitiesPage: React.FC = () => {
               <thead className="bg-[#040e06] border-b border-[#00ff66]/20 text-[#00ff66] uppercase tracking-wider">
                 <tr>
                   <th className="p-4 w-16">Code</th>
-                  <th className="p-4">Activity Title</th>
+                  <th className="p-4">Activity Title &amp; Details</th>
+                  <th className="p-4">Date / Term</th>
+                  <th className="p-4 text-center">Photos</th>
                   <th className="p-4 text-center">Order</th>
                   <th className="p-4 text-center">Status</th>
                   <th className="p-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#00ff66]/10">
-                {filtered.map((act) => (
-                  <tr key={act.id} className="hover:bg-[#051408]/60 transition-colors">
-                    <td className="p-4 text-[#00ff66] font-bold">
-                      {act.numberId || "--"}
-                    </td>
-                    <td className="p-4 font-bold text-white text-sm">
-                      {act.title}
-                    </td>
-                    <td className="p-4 text-center text-[#88aa90]">{act.displayOrder}</td>
-                    <td className="p-4 text-center">
-                      <button
-                        onClick={() => togglePublish(act)}
-                        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] tracking-wider transition-colors ${
-                          act.isPublished
-                            ? "bg-[#00ff66]/10 text-[#00ff66] border border-[#00ff66]/40"
-                            : "bg-red-500/10 text-red-400 border border-red-500/30"
-                        }`}
-                      >
-                        {act.isPublished ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
-                        {act.isPublished ? "Visible" : "Hidden"}
-                      </button>
-                    </td>
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end gap-2">
+                {filtered.map((act) => {
+                  let photoCount = 0;
+                  if (act.photoUrl) {
+                    try {
+                      const parsed = JSON.parse(act.photoUrl);
+                      photoCount = Array.isArray(parsed) ? parsed.filter(Boolean).length : 1;
+                    } catch {
+                      photoCount = 1;
+                    }
+                  }
+
+                  return (
+                    <tr key={act.id} className="hover:bg-[#051408]/60 transition-colors">
+                      <td className="p-4 text-[#00ff66] font-bold text-sm">
+                        {act.numberId || "--"}
+                      </td>
+                      <td className="p-4">
+                        <p className="font-bold text-white text-sm">{act.title}</p>
+                        {act.description && (
+                          <p className="text-[11px] text-[#88aa90] line-clamp-1 max-w-md mt-0.5">
+                            {act.description}
+                          </p>
+                        )}
+                      </td>
+                      <td className="p-4 text-[#88aa90]">
+                        {act.date ? (
+                          <span className="inline-flex items-center gap-1 text-[11px]">
+                            <Calendar className="w-3 h-3 text-[#00ff66]" />
+                            {act.date}
+                          </span>
+                        ) : (
+                          <span className="text-gray-600">—</span>
+                        )}
+                      </td>
+                      <td className="p-4 text-center">
+                        {photoCount > 0 ? (
+                          <span className="px-2 py-0.5 rounded bg-[#00ff66]/10 border border-[#00ff66]/30 text-[#00ff66] text-[10px] font-bold">
+                            {photoCount} {photoCount === 1 ? "photo" : "photos"}
+                          </span>
+                        ) : (
+                          <span className="text-gray-600 text-[10px]">None</span>
+                        )}
+                      </td>
+                      <td className="p-4 text-center text-[#88aa90]">{act.displayOrder}</td>
+                      <td className="p-4 text-center">
                         <button
-                          onClick={() => openEditModal(act)}
-                          className="p-1.5 rounded-lg text-[#88aa90] hover:text-[#00ff66] hover:bg-[#00ff66]/10 transition-colors"
+                          onClick={() => togglePublish(act)}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] tracking-wider transition-colors ${
+                            act.isPublished
+                              ? "bg-[#00ff66]/10 text-[#00ff66] border border-[#00ff66]/40"
+                              : "bg-red-500/10 text-red-400 border border-red-500/30"
+                          }`}
                         >
-                          <Edit2 className="w-4 h-4" />
+                          {act.isPublished ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
+                          {act.isPublished ? "Visible" : "Hidden"}
                         </button>
-                        <button
-                          onClick={() => setDeleteId(act.id)}
-                          className="p-1.5 rounded-lg text-[#88aa90] hover:text-red-400 hover:bg-red-500/10 transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => openEditModal(act)}
+                            className="p-1.5 rounded-lg text-[#88aa90] hover:text-[#00ff66] hover:bg-[#00ff66]/10 transition-colors"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => setDeleteId(act.id)}
+                            className="p-1.5 rounded-lg text-[#88aa90] hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -266,12 +345,12 @@ export const ActivitiesPage: React.FC = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title={editingActivity ? "Edit Activity" : "Add Activity"}
-        maxWidth="max-w-md"
+        title={editingActivity ? "Edit Activity Details" : "Add Activity to Archive"}
+        maxWidth="max-w-2xl"
       >
         <form onSubmit={handleSave} className="space-y-4">
-          <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-1">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div>
               <label className="block font-mono text-xs text-[#00ff66] uppercase mb-1">
                 Index / Code
               </label>
@@ -283,9 +362,21 @@ export const ActivitiesPage: React.FC = () => {
                 className="w-full bg-[#020603] border border-[#00ff66]/30 focus:border-[#00ff66] rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
               />
             </div>
-            <div className="col-span-2">
+            <div>
               <label className="block font-mono text-xs text-[#00ff66] uppercase mb-1">
-                Order
+                Date / Term
+              </label>
+              <input
+                type="text"
+                value={formData.date}
+                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                placeholder="e.g. 15 OCT 2025 or 2025-26"
+                className="w-full bg-[#020603] border border-[#00ff66]/30 focus:border-[#00ff66] rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block font-mono text-xs text-[#00ff66] uppercase mb-1">
+                Display Order
               </label>
               <input
                 type="number"
@@ -314,15 +405,58 @@ export const ActivitiesPage: React.FC = () => {
 
           <div>
             <label className="block font-mono text-xs text-[#00ff66] uppercase mb-1">
-              Brief Description / Details (Optional)
+              Description / Popup Details
             </label>
             <textarea
-              rows={2}
+              rows={4}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Resource person, syllabus covered, or lab details..."
+              placeholder="Detailed description of the activity, resource persons, outcomes, technologies covered..."
               className="w-full bg-[#020603] border border-[#00ff66]/30 focus:border-[#00ff66] rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
             />
+          </div>
+
+          {/* Activity Photos & Gallery Manager */}
+          <div className="border-t border-[#00ff66]/15 pt-4">
+            <h4 className="font-mono text-xs text-[#00ff66] uppercase mb-3 flex items-center justify-between">
+              <span>Activity Pictures / Screenshots ({formData.photos.length} photos)</span>
+            </h4>
+
+            {formData.photos.length > 0 && (
+              <div className="grid grid-cols-4 sm:grid-cols-6 gap-2 mb-3 max-h-40 overflow-y-auto p-2 bg-[#020603] rounded-lg border border-[#00ff66]/20">
+                {formData.photos.map((url, i) => (
+                  <div key={i} className="relative group rounded overflow-hidden border border-[#00ff66]/30 aspect-video bg-black">
+                    <img src={url} alt={`Activity photo ${i + 1}`} className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removePhoto(i)}
+                      className="absolute top-0.5 right-0.5 p-0.5 bg-red-600/90 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Remove photo"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                    <span className="absolute bottom-0 left-0 bg-black/70 text-[9px] px-1 text-[#00ff66]">
+                      #{i + 1}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="bg-[#040e06] p-3 rounded-lg border border-[#00ff66]/20 flex flex-col gap-2">
+              <span className="text-[11px] font-mono text-[#88aa90]">Add Picture:</span>
+              <ImageUploader
+                label="Select Photo or Enter URL"
+                value={newPhotoUrl}
+                onChange={(url) => {
+                  setNewPhotoUrl(url);
+                  if (url) {
+                    setFormData((prev) => ({ ...prev, photos: [...prev.photos, url] }));
+                    setNewPhotoUrl("");
+                  }
+                }}
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-2 pt-2">

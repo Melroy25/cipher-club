@@ -7,7 +7,7 @@ export default defineConfig({
     port: 3000,
     open: true,
     watch: {
-      ignored: ["**/server/**"],
+      ignored: ["**/server/**", "**/*.crdownload", "**/*.tmp"],
     },
     proxy: {
       "/api": {

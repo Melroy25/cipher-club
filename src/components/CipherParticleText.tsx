@@ -85,15 +85,16 @@ export const CipherParticleText: React.FC = () => {
       particles.length = 0;
       offCtx.clearRect(0, 0, width, height);
 
-      // Desktop target: 800–850px total word width, 150–180px letter height
-      const desktopTargetWidth = 830;
-      const desktopTargetHeight = 165;
+      // Desktop target: heavy, thick, large letters ~165-175px height
+      const targetHeight = Math.min(height * 0.76, 175);
+      // Ensure on narrow screens it scales down proportionally
+      const maxPossibleWidth = width - 32;
+      // At fontSize ~ 170px, total width with close spacing in Arial Black is ~750px
+      const scale = Math.min(1, maxPossibleWidth / 750);
+      const fontSize = Math.max(48, Math.round(targetHeight * scale));
 
-      const availableWidth = Math.min(width - 32, desktopTargetWidth);
-      const scale = availableWidth / desktopTargetWidth;
-
-      const fontSize = Math.round(desktopTargetHeight * scale);
-      offCtx.font = `900 ${fontSize}px monospace`;
+      // Ultra-heavy, bold headline font so letter strokes are thick, fat, and chunky
+      offCtx.font = `900 ${fontSize}px "Arial Black", Impact, "Segoe UI Black", "Inter", sans-serif`;
       offCtx.textBaseline = "middle";
 
       const letters = "CIPHER".split("");
@@ -102,13 +103,8 @@ export const CipherParticleText: React.FC = () => {
       );
       const sumWidths = letterWidths.reduce((sum, val) => sum + val, 0);
 
-      const targetWordWidth = Math.round(desktopTargetWidth * scale);
-
-      // Controlled gap between letters ensuring distinct separation without merging
-      const letterGap = Math.max(
-        Math.round(18 * scale),
-        (targetWordWidth - sumWidths) / (letters.length - 1)
-      );
+      // Close, tight spacing between letters as shown in reference pic (media_1790010540024.png)
+      const letterGap = Math.max(8, Math.round(fontSize * 0.11));
 
       const actualTotalWidth = sumWidths + letterGap * (letters.length - 1);
       let currentX = (width - actualTotalWidth) / 2;
@@ -127,8 +123,8 @@ export const CipherParticleText: React.FC = () => {
       const image = offCtx.getImageData(0, 0, Math.round(width), Math.round(height));
       const data = image.data;
 
-      // Fine sampling gap for dense sandy digital texture
-      const gap = Math.max(3, Math.min(4, Math.round(fontSize / 45)));
+      // Fine sampling gap for dense, solid matrix texture
+      const gap = Math.max(3, Math.min(4, Math.round(fontSize / 46)));
 
       for (let y = 0; y < height; y += gap) {
         for (let x = 0; x < width; x += gap) {

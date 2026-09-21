@@ -123,30 +123,36 @@ export const CipherParticleText: React.FC = () => {
       const image = offCtx.getImageData(0, 0, Math.round(width), Math.round(height));
       const data = image.data;
 
-      // Fine sampling gap for dense, solid matrix texture
-      const gap = Math.max(3, Math.min(4, Math.round(fontSize / 46)));
+      // Structured matrix grid intervals matching Image 2 (media_1790010843928.png):
+      // Clean columns and rows with dark breathing room so characters are not crammed together
+      const stepY = Math.max(9, Math.round(fontSize / 16.5)); // ~10-11px vertical step
+      const stepX = Math.max(7.5, Math.round(fontSize / 19.5)); // ~8.5-9px horizontal step
+      const charSize = Math.max(6.5, Math.round(stepY * 0.78)); // ~8px crisp font size
 
-      for (let y = 0; y < height; y += gap) {
-        for (let x = 0; x < width; x += gap) {
+      const startY = (height % stepY) / 2 + stepY / 2;
+      const startX = (width % stepX) / 2 + stepX / 2;
+
+      for (let y = startY; y < height; y += stepY) {
+        for (let x = startX; x < width; x += stepX) {
           const index = (Math.floor(y) * Math.round(width) + Math.floor(x)) * 4;
 
-          if (data[index + 3] > 110) {
+          if (data[index + 3] > 115) {
             const rand = Math.random();
             const colorVariation: "neon" | "emerald" | "cyber" =
               rand > 0.55 ? "neon" : rand > 0.25 ? "emerald" : "cyber";
 
             particles.push({
-              x,
-              y,
-              originX: x,
-              originY: y,
+              x: Math.round(x),
+              y: Math.round(y),
+              originX: Math.round(x),
+              originY: Math.round(y),
               vx: 0,
               vy: 0,
               char: randomChar(),
-              size: Math.max(5.5, Math.min(7.8, fontSize * 0.042 + Math.random() * 1.2)),
-              baseAlpha: 0.55 + Math.random() * 0.45,
+              size: charSize,
+              baseAlpha: 0.65 + Math.random() * 0.35,
               colorVariation,
-              brightness: 0.7 + Math.random() * 0.3,
+              brightness: 0.6 + Math.random() * 0.4,
               phase: Math.random() * Math.PI * 2,
             });
           }
@@ -279,29 +285,28 @@ export const CipherParticleText: React.FC = () => {
         ctx.textBaseline = "middle";
 
         if (isDark) {
-          if (p.colorVariation === "neon") {
+          if (p.brightness > 0.88) {
+            // Bright luminous matrix highlight glyphs seen in reference image
+            ctx.fillStyle = "#bbf7d0";
+            ctx.shadowColor = "#00ff88";
+            ctx.shadowBlur = isDisplaced ? 8 : 4;
+          } else if (p.colorVariation === "neon") {
             ctx.fillStyle = "#00ff88";
             ctx.shadowColor = "#00ff66";
+            ctx.shadowBlur = isDisplaced ? 6 : 2;
           } else if (p.colorVariation === "emerald") {
             ctx.fillStyle = "#10b981";
             ctx.shadowColor = "#10b981";
+            ctx.shadowBlur = isDisplaced ? 5 : 1;
           } else {
             ctx.fillStyle = "#34d399";
             ctx.shadowColor = "#00ff66";
+            ctx.shadowBlur = isDisplaced ? 5 : 2;
           }
-          ctx.shadowBlur = isDisplaced ? 7 : p.brightness > 0.82 ? 4 : 2;
         } else {
-          if (p.colorVariation === "neon") {
-            ctx.fillStyle = "#059669";
-            ctx.shadowColor = "#059669";
-          } else if (p.colorVariation === "emerald") {
-            ctx.fillStyle = "#047857";
-            ctx.shadowColor = "#047857";
-          } else {
-            ctx.fillStyle = "#0f766e";
-            ctx.shadowColor = "#0f766e";
-          }
-          ctx.shadowBlur = isDisplaced ? 5 : 2;
+          ctx.fillStyle = p.brightness > 0.85 ? "#047857" : "#059669";
+          ctx.shadowColor = "#059669";
+          ctx.shadowBlur = isDisplaced ? 4 : 1;
         }
 
         ctx.fillText(p.char, p.x, p.y);

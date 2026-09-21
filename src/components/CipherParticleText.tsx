@@ -19,6 +19,7 @@ export const CipherParticleText: React.FC = () => {
 
     const maskCanvas = document.createElement("canvas");
     const maskCtx = maskCanvas.getContext("2d");
+
     if (!maskCtx) return;
 
     type Particle = {
@@ -43,18 +44,23 @@ export const CipherParticleText: React.FC = () => {
     const mouse = {
       x: -10000,
       y: -10000,
+      px: -10000,
+      py: -10000,
       active: false,
     };
 
-    // Reference interaction parameters
-    const MOUSE_RADIUS = 90;
-    const MOUSE_FORCE = 8.5;
+    // Mouse interaction settings.
+    const MOUSE_RADIUS = 105;
+    const MOUSE_FORCE = 12;
 
-    // Smooth recovery
-    const RETURN_FORCE = 0.035;
-    const DAMPING = 0.88;
+    // Recovery settings.
+    const RETURN_FORCE = 0.018;
+    const DAMPING = 0.91;
 
-    // Digital characters used to construct the lettering
+    // Prevent particles from gaining unlimited velocity.
+    const MAX_SPEED = 15;
+
+    // Digital character palette.
     const DIGITAL_CHARS = "01CIPHER<>/{}[]";
 
     const resize = () => {
@@ -83,7 +89,7 @@ export const CipherParticleText: React.FC = () => {
 
       maskCtx.clearRect(0, 0, width, height);
 
-      // Bold lettering creates a clear, recognizable CIPHER silhouette
+      // Generate a bold CIPHER text mask.
       const fontSize = Math.min(width * 0.19, height * 0.78);
 
       maskCtx.font = `900 ${fontSize}px Arial, Helvetica, sans-serif`;
@@ -102,14 +108,13 @@ export const CipherParticleText: React.FC = () => {
 
       const data = imageData.data;
 
-      // Dense sampling creates the tiny-character digital texture
-      const spacing = Math.max(5, Math.round(fontSize / 22));
+      // Dense sampling for a recognizable digital wordmark.
+      const spacing = Math.max(5, Math.round(fontSize / 24));
 
       for (let y = 0; y < height; y += spacing) {
         for (let x = 0; x < width; x += spacing) {
           const index = (y * Math.round(width) + x) * 4;
 
-          // Only create characters inside the CIPHER letter shapes
           if (data[index + 3] > 100) {
             particles.push({
               x,
@@ -132,15 +137,59 @@ export const CipherParticleText: React.FC = () => {
     const handlePointerMove = (event: PointerEvent) => {
       const rect = canvas.getBoundingClientRect();
 
-      mouse.x = event.clientX - rect.left;
-      mouse.y = event.clientY - rect.top;
+      const newX = event.clientX - rect.left;
+      const newY = event.clientY - rect.top;
+
+      mouse.px = mouse.x;
+      mouse.py = mouse.y;
+
+      mouse.x = newX;
+      mouse.y = newY;
+
       mouse.active = true;
     };
 
     const handlePointerLeave = () => {
       mouse.active = false;
+
       mouse.x = -10000;
       mouse.y = -10000;
+
+      mouse.px = -10000;
+      mouse.py = -10000;
+    };
+
+    // Find the closest point on the cursor's movement segment.
+    const closestPointOnSegment = (
+      px: number,
+      py: number,
+      ax: number,
+      ay: number,
+      bx: number,
+      by: number
+    ) => {
+      const abx = bx - ax;
+      const aby = by - ay;
+
+      const lengthSquared = abx * abx + aby * aby;
+
+      if (lengthSquared === 0) {
+        return { x: ax, y: ay, t: 0 };
+      }
+
+      const t = Math.max(
+        0,
+        Math.min(
+          1,
+          ((px - ax) * abx + (py - ay) * aby) / lengthSquared
+        )
+      );
+
+      return {
+        x: ax + abx * t,
+        y: ay + aby * t,
+        t,
+      };
     };
 
     const draw = (timestamp: number) => {
@@ -152,66 +201,119 @@ export const CipherParticleText: React.FC = () => {
       ctx.clearRect(0, 0, width, height);
 
       for (const p of particles) {
-        const dx = p.x - mouse.x;
-        const dy = p.y - mouse.y;
+        let forceX = 0;
+        let forceY = 0;
 
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        // Push nearby characters away from the cursor
         if (
           mouse.active &&
-          distance < MOUSE_RADIUS &&
-          distance > 0
+          mouse.px > -1000 &&
+          mouse.py > -1000
         ) {
-          const influence = 1 - distance / MOUSE_RADIUS;
+          // Calculate distance from the entire recent mouse path.
+          const closest = closestPointOnSegment(
+            p.x,
+            p.y,
+            mouse.px,
+            mouse.py,
+            mouse.x,
+            mouse.y
+          );
 
-          const force = influence * MOUSE_FORCE;
+          const dx = p.x - closest.x;
+          const dy = p.y - closest.y;
 
-          p.vx += (dx / distance) * force;
-          p.vy += (dy / distance) * force;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+
+          if (distance < MOUSE_RADIUS && distance > 0) {
+            const influence = 1 - distance / MOUSE_RADIUS;
+
+            // Stronger impulse close to the cursor trail.
+            const force = influence * influence * MOUSE_FORCE;
+
+            // Push away from the cursor's path.
+            forceX += (dx / distance) * force;
+            forceY += (dy / distance) * force;
+
+            // Add directional movement following the cursor.
+            const moveX = mouse.x - mouse.px;
+            const moveY = mouse.y - mouse.py;
+
+            const moveLength = Math.sqrt(
+              moveX * moveX + moveY * moveY
+            );
+
+            if (moveLength > 0) {
+              const directionalForce = force * 0.65;
+
+              forceX += (moveX / moveLength) * directionalForce;
+              forceY += (moveY / moveLength) * directionalForce;
+            }
+          }
         }
 
-        // Pull characters back into their original letter positions
+        // Apply the mouse impulse.
+        p.vx += forceX;
+        p.vy += forceY;
+
+        // Gradually reconstruct the original CIPHER lettering.
         p.vx += (p.ox - p.x) * RETURN_FORCE;
         p.vy += (p.oy - p.y) * RETURN_FORCE;
 
+        // Damping creates smooth, controlled motion.
         p.vx *= DAMPING;
         p.vy *= DAMPING;
+
+        // Clamp extreme velocities.
+        const speed = Math.sqrt(p.vx * p.vx + p.vy * p.vy);
+
+        if (speed > MAX_SPEED) {
+          p.vx = (p.vx / speed) * MAX_SPEED;
+          p.vy = (p.vy / speed) * MAX_SPEED;
+        }
 
         p.x += p.vx;
         p.y += p.vy;
 
-        // Gentle shimmering illumination
+        // Subtle digital shimmer.
         const shimmer =
-          0.78 + 0.22 * Math.sin(elapsed * 2.5 + p.phase);
+          0.82 + 0.18 * Math.sin(elapsed * 2.5 + p.phase);
 
-        const nearMouse =
-          mouse.active && distance < MOUSE_RADIUS;
+        const displacement = Math.sqrt(
+          (p.x - p.ox) ** 2 + (p.y - p.oy) ** 2
+        );
 
-        // Make characters glow more brightly near the cursor
-        if (isDark) {
-          ctx.fillStyle = nearMouse
-            ? "rgba(0,255,110,1)"
-            : `rgba(0,255,110,${shimmer})`;
-          ctx.shadowColor = "#00ff66";
-        } else {
-          ctx.fillStyle = nearMouse
-            ? "rgba(5,150,105,1)"
-            : `rgba(5,150,105,${shimmer})`;
-          ctx.shadowColor = "#059669";
-        }
+        // Displaced characters glow more brightly.
+        const disturbed = displacement > 3;
 
         ctx.font = `bold ${p.size}px monospace`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
-        ctx.shadowBlur = nearMouse ? 15 : 7;
+        if (isDark) {
+          ctx.fillStyle = disturbed
+            ? "rgba(0,255,110,1)"
+            : `rgba(0,255,110,${shimmer})`;
+          ctx.shadowColor = "#00ff66";
+        } else {
+          ctx.fillStyle = disturbed
+            ? "rgba(5,150,105,1)"
+            : `rgba(5,150,105,${shimmer})`;
+          ctx.shadowColor = "#059669";
+        }
 
-        // Render digital characters instead of dots
+        ctx.shadowBlur = disturbed ? 13 : 6;
+
+        // Always render digital characters, never plain dots.
         ctx.fillText(p.char, p.x, p.y);
       }
 
       ctx.shadowBlur = 0;
+
+      // Preserve the previous cursor position for the next frame.
+      if (mouse.active) {
+        mouse.px = mouse.x;
+        mouse.py = mouse.y;
+      }
 
       animationFrame = requestAnimationFrame(draw);
     };
@@ -248,3 +350,5 @@ export const CipherParticleText: React.FC = () => {
     />
   );
 };
+
+export default CipherParticleText;

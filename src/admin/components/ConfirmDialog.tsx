@@ -1,10 +1,11 @@
-﻿import React from "react";
+import React from "react";
 import { AlertTriangle } from "lucide-react";
 import { Modal } from "./Modal.tsx";
 
 interface ConfirmDialogProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose?: () => void;
+  onCancel?: () => void;
   onConfirm: () => void;
   title: string;
   message: string;
@@ -16,6 +17,7 @@ interface ConfirmDialogProps {
 export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   isOpen,
   onClose,
+  onCancel,
   onConfirm,
   title,
   message,
@@ -23,8 +25,9 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   isDestructive = true,
   isLoading = false,
 }) => {
+  const handleClose = onClose || onCancel || (() => {});
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={title} maxWidth="max-w-md">
+    <Modal isOpen={isOpen} onClose={handleClose} title={title} maxWidth="max-w-md">
       <div className="flex flex-col items-center text-center p-2">
         <div
           className={`w-14 h-14 rounded-full flex items-center justify-center mb-4 ${
@@ -41,7 +44,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         <div className="flex items-center justify-end gap-3 w-full border-t border-[#00ff66]/15 pt-4">
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             disabled={isLoading}
             className="px-4 py-2 rounded-lg font-mono text-xs tracking-wider border border-[#00ff66]/30 text-[#88aa90] hover:text-white hover:border-[#00ff66] transition-colors"
           >

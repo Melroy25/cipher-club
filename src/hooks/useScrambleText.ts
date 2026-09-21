@@ -7,6 +7,10 @@ export function useScrambleText(targetText: string, triggerOnView: boolean = tru
   const [hasAnimated, setHasAnimated] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    setDisplayText(targetText);
+  }, [targetText]);
+
   const startScramble = () => {
     let iteration = 0;
     const maxIterations = targetText.length;

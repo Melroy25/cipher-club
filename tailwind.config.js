@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
+  darkMode: 'class',
   content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
@@ -20,8 +21,9 @@ export default {
         }
       },
       fontFamily: {
+        sans: ['"Plus Jakarta Sans"', '"Google Sans"', 'Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['"Space Grotesk"', '"Plus Jakarta Sans"', 'sans-serif'],
         mono: ['"JetBrains Mono"', '"Space Mono"', 'monospace'],
-        sans: ['"Space Grotesk"', 'Inter', 'system-ui', 'sans-serif'],
         serif: ['Cinzel', 'Playfair Display', 'serif']
       },
       boxShadow: {

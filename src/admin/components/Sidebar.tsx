@@ -3,11 +3,9 @@ import { NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Users,
-  FolderGit2,
   Calendar,
   Layers,
   Globe2,
-  BookOpen,
   Heart,
   UserCheck,
   Inbox,
@@ -37,11 +35,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
   const navItems = [
     { to: "/admin", label: "Dashboard", icon: LayoutDashboard, end: true },
     { to: "/admin/members", label: "Team Members", icon: Users },
-    { to: "/admin/projects", label: "Projects", icon: FolderGit2 },
     { to: "/admin/events", label: "Events & Workshops", icon: Calendar },
     { to: "/admin/activities", label: "Activities", icon: Layers },
     { to: "/admin/domains", label: "Domains", icon: Globe2 },
-    { to: "/admin/blog", label: "Blog Posts", icon: BookOpen },
     { to: "/admin/contributors", label: "Contributors", icon: Heart },
     { to: "/admin/applications", label: "Join Requests", icon: UserCheck },
     { to: "/admin/messages", label: "Messages", icon: Inbox },

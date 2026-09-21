@@ -1,5 +1,5 @@
-﻿import React, { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Search, Calendar, Image as ImageIcon, Eye, EyeOff, Loader2, PlusCircle, X } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Plus, Edit2, Trash2, Search, Calendar, Image as ImageIcon, Eye, EyeOff, Loader2, PlusCircle, X, Save, Sparkles } from "lucide-react";
 import { Modal } from "../components/Modal.tsx";
 import { ConfirmDialog } from "../components/ConfirmDialog.tsx";
 import { ImageUploader } from "../components/ImageUploader.tsx";
@@ -30,6 +30,7 @@ interface EventItem {
   status: string;
   displayOrder: number;
   isPublished: boolean;
+  featuredOnHome?: boolean;
   slides: EventSlide[];
 }
 
@@ -42,6 +43,14 @@ export const EventsPage: React.FC = () => {
   const [editingEvent, setEditingEvent] = useState<EventItem | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Events Page Header Configuration State
+  const [headerBadge, setHeaderBadge] = useState("WORKSHOPS & CONTESTS");
+  const [headerTitle, setHeaderTitle] = useState("Events & Workshops");
+  const [headerSubtitle, setHeaderSubtitle] = useState(
+    "From AI prompt engineering hackathons to formal department galas — explore milestone gatherings hosted by the Cipher Student Association at SJEC."
+  );
+  const [isSavingHeader, setIsSavingHeader] = useState(false);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -56,16 +65,57 @@ export const EventsPage: React.FC = () => {
     posterUrl: "",
     venue: "Kalam Auditorium",
     registrationUrl: "",
-    category: "Technical",
+    category: "Workshop",
     status: "UPCOMING",
     displayOrder: 0,
     isPublished: true,
+    featuredOnHome: true,
     slides: [] as string[],
   });
 
   const [newSlideUrl, setNewSlideUrl] = useState("");
 
   const { success, error } = useToast();
+
+  const loadHeaderSettings = async () => {
+    try {
+      const res = await fetch("/api/public/content");
+      const data = await res.json();
+      if (res.ok && data.map) {
+        if (data.map.events_badge) setHeaderBadge(data.map.events_badge);
+        if (data.map.events_title) setHeaderTitle(data.map.events_title);
+        if (data.map.events_subtitle) setHeaderSubtitle(data.map.events_subtitle);
+      }
+    } catch {}
+  };
+
+  const saveHeaderSettings = async () => {
+    try {
+      setIsSavingHeader(true);
+      const res = await fetch("/api/admin/content/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          items: [
+            { key: "events_badge", value: headerBadge, section: "events", label: "Events Top Badge" },
+            { key: "events_title", value: headerTitle, section: "events", label: "Events Main Title" },
+            { key: "events_subtitle", value: headerSubtitle, section: "events", label: "Events Subtitle" },
+          ],
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        success("Events page header updated successfully!");
+      } else {
+        error(data.message || "Failed to update header.");
+      }
+    } catch {
+      error("Network error updating header.");
+    } finally {
+      setIsSavingHeader(false);
+    }
+  };
 
   const loadEvents = async () => {
     try {
@@ -84,6 +134,7 @@ export const EventsPage: React.FC = () => {
 
   useEffect(() => {
     loadEvents();
+    loadHeaderSettings();
   }, []);
 
   const openAddModal = () => {
@@ -104,6 +155,7 @@ export const EventsPage: React.FC = () => {
       status: "UPCOMING",
       displayOrder: events.length + 1,
       isPublished: true,
+      featuredOnHome: true,
       slides: [],
     });
     setNewSlideUrl("");
@@ -134,7 +186,10 @@ export const EventsPage: React.FC = () => {
       status: ev.status,
       displayOrder: ev.displayOrder,
       isPublished: ev.isPublished,
-      slides: (ev.slides || []).map((s) => s.imageUrl),
+      featuredOnHome: ev.featuredOnHome !== false,
+      slides: (ev.slides || [])
+        .map((s: any) => (typeof s === "string" ? s : s?.imageUrl || ""))
+        .filter(Boolean),
     });
     setNewSlideUrl("");
     setIsModalOpen(true);
@@ -217,6 +272,26 @@ export const EventsPage: React.FC = () => {
     }
   };
 
+  const toggleFeaturedOnHome = async (ev: EventItem) => {
+    try {
+      const nextVal = ev.featuredOnHome === false ? true : false;
+      const res = await fetch(`/api/admin/events/${ev.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ featuredOnHome: nextVal }),
+      });
+      if (res.ok) {
+        success(`Event ${nextVal ? "featured on Home page" : "hidden from Home page"}.`);
+        loadEvents();
+      } else {
+        error("Failed to update Home page status.");
+      }
+    } catch {
+      error("Failed to update Home page status.");
+    }
+  };
+
   const addSlide = () => {
     if (!newSlideUrl) return;
     setFormData({
@@ -255,6 +330,71 @@ export const EventsPage: React.FC = () => {
         >
           <Plus className="w-4 h-4" /> CREATE EVENT
         </button>
+      </div>
+
+      {/* ── Events Page Header Configuration Card ────────────────────── */}
+      <div className="bg-[#030905] border border-[#00ff66]/25 rounded-2xl p-5 md:p-6 shadow-lg">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-[#00ff66]/15">
+          <div>
+            <h3 className="text-sm sm:text-base font-bold font-mono text-[#00ff66] flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              Public Events Page Header Text
+            </h3>
+            <p className="font-mono text-xs text-[#88aa90]">
+              Customize the badge, title, and description displayed at the top of the public Events &amp; Workshops page
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={saveHeaderSettings}
+            disabled={isSavingHeader}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold transition-all shadow-[0_0_15px_rgba(0,255,102,0.25)] hover:shadow-[0_0_20px_rgba(0,255,102,0.4)] disabled:opacity-50 shrink-0"
+          >
+            {isSavingHeader ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+            Save Header Text
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block font-mono text-xs text-[#88aa90] uppercase mb-1">
+              Top Badge Text
+            </label>
+            <input
+              type="text"
+              value={headerBadge}
+              onChange={(e) => setHeaderBadge(e.target.value)}
+              placeholder="e.g. WORKSHOPS & CONTESTS"
+              className="w-full bg-[#020603] border border-[#00ff66]/30 focus:border-[#00ff66] rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block font-mono text-xs text-[#88aa90] uppercase mb-1">
+              Main Heading (use &amp; for green highlight)
+            </label>
+            <input
+              type="text"
+              value={headerTitle}
+              onChange={(e) => setHeaderTitle(e.target.value)}
+              placeholder="e.g. Events & Workshops"
+              className="w-full bg-[#020603] border border-[#00ff66]/30 focus:border-[#00ff66] rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block font-mono text-xs text-[#88aa90] uppercase mb-1">
+              Subtitle Description
+            </label>
+            <textarea
+              rows={2}
+              value={headerSubtitle}
+              onChange={(e) => setHeaderSubtitle(e.target.value)}
+              placeholder="From AI prompt engineering hackathons to formal department galas..."
+              className="w-full bg-[#020603] border border-[#00ff66]/30 focus:border-[#00ff66] rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Filter / Search Bar */}
@@ -300,7 +440,7 @@ export const EventsPage: React.FC = () => {
                   <th className="p-4">Event</th>
                   <th className="p-4">Tag / Date</th>
                   <th className="p-4">Gallery Slides</th>
-                  <th className="p-4 text-center">Status</th>
+                  <th className="p-4 text-center">Home Page</th>
                   <th className="p-4 text-center">Visibility</th>
                   <th className="p-4 text-right">Actions</th>
                 </tr>
@@ -329,17 +469,18 @@ export const EventsPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="p-4 text-center">
-                      <span
-                        className={`px-2 py-0.5 rounded text-[10px] tracking-wider uppercase font-bold ${
-                          ev.status === "UPCOMING"
-                            ? "bg-amber-500/15 text-amber-400 border border-amber-500/30"
-                            : ev.status === "COMPLETED"
-                            ? "bg-[#00ff66]/15 text-[#00ff66] border border-[#00ff66]/30"
-                            : "bg-red-500/15 text-red-400 border border-red-500/30"
+                      <button
+                        type="button"
+                        onClick={() => toggleFeaturedOnHome(ev)}
+                        className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] tracking-wider transition-colors ${
+                          ev.featuredOnHome !== false
+                            ? "bg-[#00ff66]/15 text-[#00ff66] border border-[#00ff66]/40 hover:bg-[#00ff66]/25"
+                            : "bg-gray-800/60 text-gray-400 border border-gray-700 hover:text-white"
                         }`}
+                        title={ev.featuredOnHome !== false ? "Click to hide from Home page" : "Click to feature on Home page"}
                       >
-                        {ev.status}
-                      </span>
+                        {ev.featuredOnHome !== false ? "⭐ On Home" : "☆ Hidden"}
+                      </button>
                     </td>
                     <td className="p-4 text-center">
                       <button
@@ -403,19 +544,37 @@ export const EventsPage: React.FC = () => {
 
             <div>
               <label className="block font-mono text-xs text-[#00ff66] uppercase mb-1">
-                Tag / Category Label
+                Category / Tag *
               </label>
-              <input
-                type="text"
+              <select
                 value={formData.tag}
                 onChange={(e) => setFormData({ ...formData, tag: e.target.value })}
-                placeholder="e.g. BRANCH GALA, COMPETITION, WORKSHOP"
                 className="w-full bg-[#020603] border border-[#00ff66]/30 focus:border-[#00ff66] rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
-              />
+              >
+                <option value="WORKSHOP">WORKSHOP</option>
+                <option value="EVENT">EVENT</option>
+                <option value="BRANCH ENTRY">BRANCH ENTRY</option>
+                {formData.tag && !["WORKSHOP", "EVENT", "BRANCH ENTRY"].includes(formData.tag) && (
+                  <option value={formData.tag}>{formData.tag}</option>
+                )}
+              </select>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block font-mono text-xs text-[#00ff66] uppercase mb-1">
+                Organized By
+              </label>
+              <input
+                type="text"
+                value={formData.cardSub}
+                onChange={(e) => setFormData({ ...formData, cardSub: e.target.value })}
+                placeholder="e.g. AgentBlazer Club × Cipher"
+                className="w-full bg-[#020603] border border-[#00ff66]/30 focus:border-[#00ff66] rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
+              />
+            </div>
+
             <div>
               <label className="block font-mono text-xs text-[#00ff66] uppercase mb-1">
                 Date Tag *
@@ -441,21 +600,6 @@ export const EventsPage: React.FC = () => {
                 placeholder="e.g. Kalam Auditorium"
                 className="w-full bg-[#020603] border border-[#00ff66]/30 focus:border-[#00ff66] rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
               />
-            </div>
-
-            <div>
-              <label className="block font-mono text-xs text-[#00ff66] uppercase mb-1">
-                Status
-              </label>
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                className="w-full bg-[#020603] border border-[#00ff66]/30 focus:border-[#00ff66] rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
-              >
-                <option value="UPCOMING">UPCOMING</option>
-                <option value="COMPLETED">COMPLETED</option>
-                <option value="CANCELLED">CANCELLED</option>
-              </select>
             </div>
           </div>
 
@@ -531,18 +675,33 @@ export const EventsPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-2">
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="eventActive"
-                checked={formData.isPublished}
-                onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
-                className="w-4 h-4 rounded bg-black border-[#00ff66]/30 text-[#00ff66]"
-              />
-              <label htmlFor="eventActive" className="font-mono text-xs text-white">
-                Visible on public website
-              </label>
+          <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="eventActive"
+                  checked={formData.isPublished}
+                  onChange={(e) => setFormData({ ...formData, isPublished: e.target.checked })}
+                  className="w-4 h-4 rounded bg-black border-[#00ff66]/30 text-[#00ff66]"
+                />
+                <label htmlFor="eventActive" className="font-mono text-xs text-white">
+                  Visible on public website
+                </label>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="featuredOnHome"
+                  checked={formData.featuredOnHome}
+                  onChange={(e) => setFormData({ ...formData, featuredOnHome: e.target.checked })}
+                  className="w-4 h-4 rounded bg-black border-[#00ff66]/30 text-[#00ff66]"
+                />
+                <label htmlFor="featuredOnHome" className="font-mono text-xs text-white flex items-center gap-1">
+                  ⭐ Feature on Home Page
+                </label>
+              </div>
             </div>
 
             <div className="flex items-center gap-2">

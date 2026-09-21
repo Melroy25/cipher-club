@@ -1,7 +1,14 @@
 import React, { useEffect, useRef } from 'react';
+import { useTheme } from '../context/ThemeContext.tsx';
 
 export const TopographicBackground: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { theme } = useTheme();
+  const themeRef = useRef(theme);
+
+  useEffect(() => {
+    themeRef.current = theme;
+  }, [theme]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -25,7 +32,8 @@ export const TopographicBackground: React.FC = () => {
     const lines = 65; // Number of contour lines across the screen
 
     const draw = () => {
-      ctx.fillStyle = '#030804';
+      const isDark = themeRef.current === 'dark';
+      ctx.fillStyle = isDark ? '#030804' : '#ffffff';
       ctx.fillRect(0, 0, width, height);
 
       t += 0.003;
@@ -35,7 +43,11 @@ export const TopographicBackground: React.FC = () => {
         const baseY = height * 0.1 + lineFraction * height * 0.9;
         
         ctx.beginPath();
-        ctx.strokeStyle = `rgba(0, 255, 102, ${0.07 + (i % 3 === 0 ? 0.09 : 0.04)})`;
+        if (isDark) {
+          ctx.strokeStyle = `rgba(0, 255, 102, ${0.07 + (i % 3 === 0 ? 0.09 : 0.04)})`;
+        } else {
+          ctx.strokeStyle = `rgba(16, 185, 129, ${0.09 + (i % 3 === 0 ? 0.08 : 0.04)})`;
+        }
         ctx.lineWidth = i % 5 === 0 ? 1.5 : 0.8;
 
         for (let x = 0; x <= width; x += 15) {

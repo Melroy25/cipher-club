@@ -68,49 +68,49 @@ export const JoinModal: React.FC<JoinModalProps> = ({ isOpen, onClose }) => {
     setFormData((f) => ({ ...f, [key]: val }));
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 dark:bg-black/85 backdrop-blur-md animate-fadeIn">
       {/* Backdrop */}
       <div className="fixed inset-0" onClick={onClose} />
 
       {/* Modal Container */}
-      <div className="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl border border-[#00ff66]/40 bg-[#040e06] p-6 sm:p-8 shadow-[0_0_50px_rgba(0,255,102,0.3)] scrollbar-none">
+      <div className="relative z-10 w-full max-w-xl max-h-[90vh] overflow-y-auto rounded-2xl border border-gray-200 dark:border-[#00ff66]/40 bg-white dark:bg-[#040e06] p-6 sm:p-8 shadow-2xl dark:shadow-[0_0_50px_rgba(0,255,102,0.3)] scrollbar-none font-sans transition-colors">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-lg border border-[#00ff66]/30 text-[#00ff66] hover:bg-[#00ff66] hover:text-black transition-colors"
+          className="absolute top-5 right-5 p-2 rounded-lg border border-gray-200 dark:border-[#00ff66]/30 text-gray-600 dark:text-[#00ff66] hover:bg-gray-100 dark:hover:bg-[#00ff66] hover:text-black transition-colors"
           aria-label="Close modal"
         >
           <X className="w-5 h-5" />
         </button>
 
         {/* Modal Header */}
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#00ff66]/10 border border-[#00ff66]/30 font-mono text-[10px] tracking-widest text-[#00ff66] mb-3 uppercase">
-          <Shield className="w-3 h-3" />
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-[#00ff66]/10 border border-emerald-200 dark:border-[#00ff66]/30 font-sans text-xs font-semibold tracking-wider text-emerald-700 dark:text-[#00ff66] mb-3 uppercase">
+          <Shield className="w-3.5 h-3.5" />
           <span>Membership Protocol</span>
         </div>
 
-        <h3 className="text-2xl sm:text-3xl font-mono font-bold text-white mb-2 tracking-tight">
-          Join <span className="text-[#00ff66] text-glow">CIPHER</span>
+        <h3 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mb-2 tracking-tight font-sans">
+          Join <span className="text-emerald-600 dark:text-[#00ff66] dark:text-glow">CIPHER</span>
         </h3>
 
-        <p className="font-mono text-xs text-[#88aa90] mb-6 leading-relaxed">
+        <p className="text-xs sm:text-sm text-gray-600 dark:text-[#a0c0a8] mb-6 leading-relaxed font-sans">
           Submit your application to the Cipher Student Association. The executive council reviews submissions for workshop leads, event organizers, and technical cohorts.
         </p>
 
         {submitted ? (
-          <div className="py-12 text-center flex flex-col items-center justify-center gap-4 animate-in fade-in zoom-in duration-300">
-            <div className="w-16 h-16 rounded-full bg-[#00ff66]/20 border border-[#00ff66] flex items-center justify-center text-[#00ff66] shadow-[0_0_25px_rgba(0,255,102,0.5)]">
+          <div className="py-12 text-center flex flex-col items-center justify-center gap-4 animate-in fade-in zoom-in duration-300 font-sans">
+            <div className="w-16 h-16 rounded-full bg-emerald-100 dark:bg-[#00ff66]/20 border border-emerald-500 dark:border-[#00ff66] flex items-center justify-center text-emerald-600 dark:text-[#00ff66] shadow-md dark:shadow-[0_0_25px_rgba(0,255,102,0.5)]">
               <CheckCircle2 className="w-9 h-9" />
             </div>
-            <div className="font-mono text-base font-bold text-white">
-              Transmission Received
+            <div className="text-lg font-bold text-gray-900 dark:text-white">
+              Application Received
             </div>
-            <p className="font-mono text-xs text-[#a0c0a8] max-w-sm">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-[#a0c0a8] max-w-sm">
               Your application has been logged into the Cipher database. The council will reach out to you via email.
             </p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4 font-mono">
+          <form onSubmit={handleSubmit} className="space-y-4 font-sans">
             {errorMessage && (
               <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-xs">
                 {errorMessage}
@@ -120,7 +120,7 @@ export const JoinModal: React.FC<JoinModalProps> = ({ isOpen, onClose }) => {
             {/* Name + Email */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-[#00ff66] mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-gray-700 dark:text-[#00ff66] mb-1.5 uppercase tracking-wide">
                   Full Name *
                 </label>
                 <input
@@ -129,12 +129,12 @@ export const JoinModal: React.FC<JoinModalProps> = ({ isOpen, onClose }) => {
                   value={formData.name}
                   onChange={(e) => field("name", e.target.value)}
                   placeholder="e.g. Alex Johnson"
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-black/60 border border-[#00ff66]/25 focus:border-[#00ff66] text-white text-xs placeholder-[#44664e] outline-none transition-colors"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-gray-50 dark:bg-black/60 border border-gray-300 dark:border-[#00ff66]/25 focus:border-emerald-500 dark:focus:border-[#00ff66] text-gray-900 dark:text-white text-xs placeholder-gray-400 dark:placeholder-[#44664e] outline-none transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-xs text-[#00ff66] mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-gray-700 dark:text-[#00ff66] mb-1.5 uppercase tracking-wide">
                   College / Personal Email *
                 </label>
                 <input
@@ -143,7 +143,7 @@ export const JoinModal: React.FC<JoinModalProps> = ({ isOpen, onClose }) => {
                   value={formData.email}
                   onChange={(e) => field("email", e.target.value)}
                   placeholder="student@sjec.ac.in"
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-black/60 border border-[#00ff66]/25 focus:border-[#00ff66] text-white text-xs placeholder-[#44664e] outline-none transition-colors"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-gray-50 dark:bg-black/60 border border-gray-300 dark:border-[#00ff66]/25 focus:border-emerald-500 dark:focus:border-[#00ff66] text-gray-900 dark:text-white text-xs placeholder-gray-400 dark:placeholder-[#44664e] outline-none transition-colors"
                 />
               </div>
             </div>
@@ -151,7 +151,7 @@ export const JoinModal: React.FC<JoinModalProps> = ({ isOpen, onClose }) => {
             {/* Phone + USN */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-[#00ff66] mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-gray-700 dark:text-[#00ff66] mb-1.5 uppercase tracking-wide">
                   Phone Number
                 </label>
                 <input
@@ -159,12 +159,12 @@ export const JoinModal: React.FC<JoinModalProps> = ({ isOpen, onClose }) => {
                   value={formData.phone}
                   onChange={(e) => field("phone", e.target.value)}
                   placeholder="+91 98765 43210"
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-black/60 border border-[#00ff66]/25 focus:border-[#00ff66] text-white text-xs placeholder-[#44664e] outline-none transition-colors"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-gray-50 dark:bg-black/60 border border-gray-300 dark:border-[#00ff66]/25 focus:border-emerald-500 dark:focus:border-[#00ff66] text-gray-900 dark:text-white text-xs placeholder-gray-400 dark:placeholder-[#44664e] outline-none transition-colors"
                 />
               </div>
 
               <div>
-                <label className="block text-xs text-[#00ff66] mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-gray-700 dark:text-[#00ff66] mb-1.5 uppercase tracking-wide">
                   USN (College ID)
                 </label>
                 <input
@@ -172,7 +172,7 @@ export const JoinModal: React.FC<JoinModalProps> = ({ isOpen, onClose }) => {
                   value={formData.usn}
                   onChange={(e) => field("usn", e.target.value)}
                   placeholder="4SO23CS..."
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-black/60 border border-[#00ff66]/25 focus:border-[#00ff66] text-white text-xs placeholder-[#44664e] outline-none transition-colors"
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-gray-50 dark:bg-black/60 border border-gray-300 dark:border-[#00ff66]/25 focus:border-emerald-500 dark:focus:border-[#00ff66] text-gray-900 dark:text-white text-xs placeholder-gray-400 dark:placeholder-[#44664e] outline-none transition-colors"
                 />
               </div>
             </div>
@@ -180,13 +180,13 @@ export const JoinModal: React.FC<JoinModalProps> = ({ isOpen, onClose }) => {
             {/* Semester + Domain Interest */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-[#00ff66] mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-gray-700 dark:text-[#00ff66] mb-1.5 uppercase tracking-wide">
                   Semester / Year
                 </label>
                 <select
                   value={formData.semester}
                   onChange={(e) => field("semester", e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-lg bg-[#020703] border border-[#00ff66]/25 focus:border-[#00ff66] text-white text-xs outline-none transition-colors"
+                  className="w-full px-3 py-2.5 rounded-lg bg-gray-50 dark:bg-[#020703] border border-gray-300 dark:border-[#00ff66]/25 focus:border-emerald-500 dark:focus:border-[#00ff66] text-gray-900 dark:text-white text-xs outline-none transition-colors"
                 >
                   <option>1st Sem (1st Year)</option>
                   <option>2nd Sem (1st Year)</option>
@@ -200,13 +200,13 @@ export const JoinModal: React.FC<JoinModalProps> = ({ isOpen, onClose }) => {
               </div>
 
               <div>
-                <label className="block text-xs text-[#00ff66] mb-1.5 uppercase tracking-wider">
+                <label className="block text-xs font-semibold text-gray-700 dark:text-[#00ff66] mb-1.5 uppercase tracking-wide">
                   Domain Preference
                 </label>
                 <select
                   value={formData.domain}
                   onChange={(e) => field("domain", e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-lg bg-[#020703] border border-[#00ff66]/25 focus:border-[#00ff66] text-white text-xs outline-none transition-colors"
+                  className="w-full px-3 py-2.5 rounded-lg bg-gray-50 dark:bg-[#020703] border border-gray-300 dark:border-[#00ff66]/25 focus:border-emerald-500 dark:focus:border-[#00ff66] text-gray-900 dark:text-white text-xs outline-none transition-colors"
                 >
                   {DOMAINS.map((d) => (
                     <option key={d} value={d}>{d}</option>
@@ -217,7 +217,7 @@ export const JoinModal: React.FC<JoinModalProps> = ({ isOpen, onClose }) => {
 
             {/* Skills / Background */}
             <div>
-              <label className="block text-xs text-[#00ff66] mb-1.5 uppercase tracking-wider">
+              <label className="block text-xs font-semibold text-gray-700 dark:text-[#00ff66] mb-1.5 uppercase tracking-wide">
                 Tech Stack / Experience / Interests
               </label>
               <input
@@ -225,13 +225,13 @@ export const JoinModal: React.FC<JoinModalProps> = ({ isOpen, onClose }) => {
                 value={formData.skills}
                 onChange={(e) => field("skills", e.target.value)}
                 placeholder="e.g. Python, React, UI/UX, Video Editing, Event Organizing..."
-                className="w-full px-3.5 py-2.5 rounded-lg bg-black/60 border border-[#00ff66]/25 focus:border-[#00ff66] text-white text-xs placeholder-[#44664e] outline-none transition-colors"
+                className="w-full px-3.5 py-2.5 rounded-lg bg-gray-50 dark:bg-black/60 border border-gray-300 dark:border-[#00ff66]/25 focus:border-emerald-500 dark:focus:border-[#00ff66] text-gray-900 dark:text-white text-xs placeholder-gray-400 dark:placeholder-[#44664e] outline-none transition-colors"
               />
             </div>
 
             {/* Reason */}
             <div>
-              <label className="block text-xs text-[#00ff66] mb-1.5 uppercase tracking-wider">
+              <label className="block text-xs font-semibold text-gray-700 dark:text-[#00ff66] mb-1.5 uppercase tracking-wide">
                 Why do you want to join CIPHER? *
               </label>
               <textarea
@@ -240,14 +240,14 @@ export const JoinModal: React.FC<JoinModalProps> = ({ isOpen, onClose }) => {
                 value={formData.reason}
                 onChange={(e) => field("reason", e.target.value)}
                 placeholder="Tell us what you'd like to build, learn, or contribute to the club..."
-                className="w-full px-3.5 py-2.5 rounded-lg bg-black/60 border border-[#00ff66]/25 focus:border-[#00ff66] text-white text-xs placeholder-[#44664e] outline-none transition-colors resize-none"
+                className="w-full px-3.5 py-2.5 rounded-lg bg-gray-50 dark:bg-black/60 border border-gray-300 dark:border-[#00ff66]/25 focus:border-emerald-500 dark:focus:border-[#00ff66] text-gray-900 dark:text-white text-xs placeholder-gray-400 dark:placeholder-[#44664e] outline-none transition-colors resize-none"
               />
             </div>
 
             <button
               type="submit"
               disabled={submitting}
-              className="w-full mt-2 bg-[#00ff66] hover:bg-[#00e65b] text-[#030804] font-mono font-bold text-xs tracking-widest py-3.5 rounded-lg shadow-[0_0_20px_rgba(0,255,102,0.4)] hover:shadow-[0_0_30px_rgba(0,255,102,0.7)] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
+              className="w-full mt-2 bg-emerald-600 dark:bg-[#00ff66] hover:bg-emerald-500 dark:hover:bg-[#00e65b] text-white dark:text-[#030804] font-bold text-xs tracking-wider py-3.5 rounded-lg shadow-md dark:shadow-[0_0_20px_rgba(0,255,102,0.4)] transition-all flex items-center justify-center gap-2 disabled:opacity-60"
             >
               {submitting ? (
                 <>
@@ -257,7 +257,7 @@ export const JoinModal: React.FC<JoinModalProps> = ({ isOpen, onClose }) => {
               ) : (
                 <>
                   <Send className="w-4 h-4" />
-                  <span>TRANSMIT APPLICATION &rarr;</span>
+                  <span>SUBMIT APPLICATION &rarr;</span>
                 </>
               )}
             </button>

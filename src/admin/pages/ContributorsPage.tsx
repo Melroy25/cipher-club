@@ -6,6 +6,7 @@ import {
 } from "lucide-react";
 import { Modal } from "../components/Modal.tsx";
 import { ConfirmDialog } from "../components/ConfirmDialog.tsx";
+import { ImageUploader } from "../components/ImageUploader.tsx";
 import { useToast } from "../context/ToastContext.tsx";
 
 interface Contributor {
@@ -13,6 +14,7 @@ interface Contributor {
   name: string;
   role: string;
   eventName: string;
+  teamName?: string;
   department: string;
   batch?: string | null;
   photoUrl?: string | null;
@@ -27,10 +29,11 @@ interface Contributor {
 const DEFAULT_FORM = {
   name: "",
   role: "",
-  eventName: "",
+  teamName: "",
   department: "Computer Science & Engineering",
   batch: "2nd Year CSE",
   photoUrl: "",
+  modalPhotoUrl: "",
   bio: "",
   github: "",
   linkedin: "",
@@ -82,10 +85,11 @@ export const ContributorsPage: React.FC = () => {
     setFormData({
       name: item.name,
       role: item.role,
-      eventName: item.eventName,
+      teamName: item.eventName || item.teamName || "",
       department: item.department || "Computer Science & Engineering",
       batch: item.batch || "",
       photoUrl: item.photoUrl || "",
+      modalPhotoUrl: (item as any).modalPhotoUrl || "",
       bio: item.bio || "",
       github: item.github || "",
       linkedin: item.linkedin || "",
@@ -98,8 +102,8 @@ export const ContributorsPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.name.trim() || !formData.role.trim() || !formData.eventName.trim()) {
-      error("Name, role, and event name are required");
+    if (!formData.name.trim() || !formData.role.trim() || !formData.teamName.trim()) {
+      error("Name, role, and team name are required");
       return;
     }
     setIsSubmitting(true);
@@ -109,11 +113,16 @@ export const ContributorsPage: React.FC = () => {
         : "/api/admin/contributors";
       const method = editingItem ? "PUT" : "POST";
 
+      const payload = {
+        ...formData,
+        eventName: formData.teamName, // maps to eventName in DB/API
+      };
+
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
       const data = await res.json();
       if (res.ok && data.success) {
@@ -175,7 +184,8 @@ export const ContributorsPage: React.FC = () => {
     (c) =>
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       c.role.toLowerCase().includes(search.toLowerCase()) ||
-      c.eventName.toLowerCase().includes(search.toLowerCase())
+      (c.eventName && c.eventName.toLowerCase().includes(search.toLowerCase())) ||
+      (c.teamName && c.teamName.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -184,7 +194,7 @@ export const ContributorsPage: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-mono font-bold text-white flex items-center gap-2">
-            <Heart className="w-6 h-6 text-[#00ff66]" /> Event Contributors
+            <Heart className="w-6 h-6 text-[#00ff66]" /> Contributors
           </h1>
           <p className="font-mono text-xs text-[#88aa90] mt-1">
             {contributors.length} contributors · {contributors.filter((c) => c.isPublished).length} visible on site
@@ -205,7 +215,7 @@ export const ContributorsPage: React.FC = () => {
           type="text"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search by contributor name, event, or role..."
+          placeholder="Search by contributor name, team, or role..."
           className="w-full pl-9 pr-4 py-2.5 bg-[#041006] border border-[#00ff66]/25 rounded-xl font-mono text-xs text-white placeholder-[#88aa90]/60 focus:outline-none focus:border-[#00ff66] transition-colors"
         />
       </div>
@@ -219,7 +229,7 @@ export const ContributorsPage: React.FC = () => {
         <div className="text-center py-20 font-mono">
           <Heart className="w-10 h-10 text-[#00ff66]/30 mx-auto mb-3" />
           <p className="text-[#88aa90] text-sm">
-            {search ? "No contributors match your search." : "No event contributors yet. Add one!"}
+            {search ? "No contributors match your search." : "No contributors yet. Add one!"}
           </p>
         </div>
       ) : (
@@ -247,7 +257,7 @@ export const ContributorsPage: React.FC = () => {
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap mb-1">
                       <span className="font-mono text-[9px] px-2 py-0.5 rounded bg-[#00ff66]/10 text-[#00ff66] border border-[#00ff66]/20 uppercase">
-                        {item.eventName}
+                        {item.teamName || item.eventName}
                       </span>
                       {item.batch && (
                         <span className="font-mono text-[9px] text-[#88aa90]">
@@ -300,7 +310,7 @@ export const ContributorsPage: React.FC = () => {
       <Modal
         isOpen={isModalOpen}
         onClose={() => !isSubmitting && setIsModalOpen(false)}
-        title={editingItem ? "Edit Contributor" : "Add Event Contributor"}
+        title={editingItem ? "Edit Contributor" : "Add Contributor"}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-3">
@@ -322,7 +332,7 @@ export const ContributorsPage: React.FC = () => {
                 required
                 value={formData.role}
                 onChange={(e) => field("role", e.target.value)}
-                placeholder="e.g. Volunteer Lead / Host"
+                placeholder="e.g. Core Developer, Lead Designer"
                 className="w-full px-3 py-2 bg-[#020703] border border-[#00ff66]/25 rounded-lg font-mono text-xs text-white placeholder-[#88aa90]/50 focus:outline-none focus:border-[#00ff66]"
               />
             </div>
@@ -330,13 +340,13 @@ export const ContributorsPage: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-mono text-xs text-[#88aa90] mb-1">Event Name *</label>
+              <label className="block font-mono text-xs text-[#88aa90] mb-1">Team Name *</label>
               <input
                 type="text"
                 required
-                value={formData.eventName}
-                onChange={(e) => field("eventName", e.target.value)}
-                placeholder="e.g. Prompt Ops-2K26"
+                value={formData.teamName}
+                onChange={(e) => field("teamName", e.target.value)}
+                placeholder="e.g. Core Team, Web Team, Design Team"
                 className="w-full px-3 py-2 bg-[#020703] border border-[#00ff66]/25 rounded-lg font-mono text-xs text-white placeholder-[#88aa90]/50 focus:outline-none focus:border-[#00ff66]"
               />
             </div>
@@ -352,14 +362,19 @@ export const ContributorsPage: React.FC = () => {
             </div>
           </div>
 
-          <div>
-            <label className="block font-mono text-xs text-[#88aa90] mb-1">Photo URL</label>
-            <input
-              type="text"
+          {/* Photos — 2 side-by-side exactly like Team Members */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <ImageUploader
+              label="Carousel Photo *"
               value={formData.photoUrl}
-              onChange={(e) => field("photoUrl", e.target.value)}
-              placeholder="/assets/leaders/... or https://..."
-              className="w-full px-3 py-2 bg-[#020703] border border-[#00ff66]/25 rounded-lg font-mono text-xs text-white placeholder-[#88aa90]/50 focus:outline-none focus:border-[#00ff66]"
+              onChange={(url) => field("photoUrl", url)}
+              placeholder="Shown on carousel card"
+            />
+            <ImageUploader
+              label="Modal Spotlight Photo (Optional)"
+              value={formData.modalPhotoUrl}
+              onChange={(url) => field("modalPhotoUrl", url)}
+              placeholder="Shown when card is clicked"
             />
           </div>
 

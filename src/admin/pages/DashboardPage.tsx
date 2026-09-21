@@ -5,7 +5,7 @@ import {
   Calendar,
   Layers,
   Globe2,
-  FolderGit2,
+  Heart,
   ArrowUpRight,
 } from "lucide-react";
 
@@ -15,27 +15,27 @@ export const DashboardPage: React.FC = () => {
     events: 0,
     activities: 0,
     domains: 0,
-    projects: 0,
+    contributors: 0,
   });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadStats() {
       try {
-        const [mRes, eRes, aRes, dRes, pRes] = await Promise.all([
+        const [mRes, eRes, aRes, dRes, cRes] = await Promise.all([
           fetch("/api/admin/members", { credentials: "include" }),
           fetch("/api/admin/events", { credentials: "include" }),
           fetch("/api/admin/activities", { credentials: "include" }),
           fetch("/api/admin/domains", { credentials: "include" }),
-          fetch("/api/admin/projects", { credentials: "include" }),
+          fetch("/api/admin/contributors", { credentials: "include" }),
         ]);
 
-        const [m, e, a, d, p] = await Promise.all([
+        const [m, e, a, d, c] = await Promise.all([
           mRes.ok ? mRes.json() : { data: [] },
           eRes.ok ? eRes.json() : { data: [] },
           aRes.ok ? aRes.json() : { data: [] },
           dRes.ok ? dRes.json() : { data: [] },
-          pRes.ok ? pRes.json() : { data: [] },
+          cRes.ok ? cRes.json() : { data: [] },
         ]);
 
         setStats({
@@ -43,7 +43,7 @@ export const DashboardPage: React.FC = () => {
           events: e.data?.length || 0,
           activities: a.data?.length || 0,
           domains: d.data?.length || 0,
-          projects: p.data?.length || 0,
+          contributors: c.data?.length || 0,
         });
       } catch (err) {
         console.error("Failed to load dashboard counts:", err);
@@ -85,11 +85,11 @@ export const DashboardPage: React.FC = () => {
       desc: "Core Pillar Tracks",
     },
     {
-      title: "Projects",
-      count: stats.projects,
-      link: "/admin/projects",
-      icon: FolderGit2,
-      desc: "Showcase & Repos",
+      title: "Contributors",
+      count: stats.contributors,
+      link: "/admin/contributors",
+      icon: Heart,
+      desc: "Event Volunteers & Leads",
     },
   ];
 

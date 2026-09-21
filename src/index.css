@@ -4,9 +4,18 @@
 
 @layer base {
   body {
+    font-family: 'Plus Jakarta Sans', 'Google Sans', Inter, system-ui, -apple-system, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  html:not(.dark) body {
+    background-color: #ffffff;
+    color: #111827;
+  }
+
+  html.dark body {
     background-color: #030804;
-    color: #e2fbe8;
-    font-family: 'Space Grotesk', sans-serif;
+    color: #f3f4f6;
   }
 
   /* Custom cursor is ONLY hidden on elements inside the public site container */
@@ -47,16 +56,42 @@
 ::-webkit-scrollbar {
   width: 8px;
 }
-::-webkit-scrollbar-track {
+html:not(.dark) ::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+html.dark ::-webkit-scrollbar-track {
   background: #020603;
 }
-::-webkit-scrollbar-thumb {
+html:not(.dark) ::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+html.dark ::-webkit-scrollbar-thumb {
   background: #00ff6633;
   border-radius: 4px;
   border: 1px solid rgba(0, 255, 102, 0.2);
 }
-::-webkit-scrollbar-thumb:hover {
+html.dark ::-webkit-scrollbar-thumb:hover {
   background: #00ff6677;
+}
+
+/* Hide scrollbar completely on cards and modals */
+.scrollbar-none,
+.no-scrollbar,
+.modal-no-scrollbar,
+.scrollbar-none::-webkit-scrollbar,
+.no-scrollbar::-webkit-scrollbar,
+.modal-no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+.scrollbar-none,
+.no-scrollbar,
+.modal-no-scrollbar {
+  -ms-overflow-style: none !important;
+  scrollbar-width: none !important;
 }
 
 /* CRT Scanlines Overlay */
@@ -80,12 +115,12 @@
   pointer-events: none;
 }
 
-/* Glow Effects */
-.text-glow {
+/* Glow Effects — dark mode only */
+html.dark .text-glow {
   text-shadow: 0 0 10px rgba(0, 255, 102, 0.7), 0 0 20px rgba(0, 255, 102, 0.4);
 }
 
-.text-glow-lg {
+html.dark .text-glow-lg {
   text-shadow: 0 0 15px rgba(0, 255, 102, 0.8), 0 0 35px rgba(0, 255, 102, 0.6), 0 0 50px rgba(0, 255, 102, 0.3);
 }
 
@@ -138,7 +173,7 @@
   animation: textFlicker 3s infinite;
 }
 
-/* Cyberpunk Floating Navbar Shimmer — contained border-only effect */
+/* Cyberpunk Floating Navbar Shimmer — dark mode only, contained border-only effect */
 .cyber-shimmer-bg {
   position: absolute;
   inset: 0;
@@ -183,9 +218,20 @@
   position: absolute;
   width: 7px;
   height: 7px;
-  border: 1.5px solid #00ff66;
   opacity: 0;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Dark mode corner brackets — neon green */
+html.dark .corner-link::before,
+html.dark .corner-link::after {
+  border: 1.5px solid #00ff66;
+}
+
+/* Light mode corner brackets — emerald */
+html:not(.dark) .corner-link::before,
+html:not(.dark) .corner-link::after {
+  border: 1.5px solid #059669;
 }
 
 .corner-link::before {
@@ -205,53 +251,47 @@
 }
 
 .corner-link:hover::before,
-.corner-link:hover::after,
-.corner-link.active::before,
-.corner-link.active::after {
+.corner-link:hover::after {
   opacity: 1;
   transform: translate(0, 0);
 }
 
-.corner-link.active {
+/* Active state */
+html.dark .corner-link.active {
   color: #00ff66 !important;
   text-shadow: 0 0 10px rgba(0, 255, 102, 0.5);
 }
 
-/* Light Mode Overrides */
-html.light {
-  background-color: #f4faf5;
-  color: #05260f;
+html:not(.dark) .corner-link,
+html.light .corner-link {
+  color: #000000;
 }
 
-html.light body {
-  background-color: #f4faf5;
-  color: #05260f;
+html:not(.dark) .corner-link.active,
+html.light .corner-link.active {
+  color: #000000 !important;
+  text-shadow: none;
+  font-weight: 800;
 }
 
-html.light .bg-\[\#030804\] {
-  background-color: #f4faf5 !important;
+/* Infinite Marquee Moving Bar */
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
-html.light .bg-\[\#020703\],
-html.light .bg-\[\#020603\] {
-  background-color: #eaf5ec !important;
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: marqueeScroll 28s linear infinite;
 }
 
-html.light .text-white {
-  color: #062b11 !important;
+.animate-marquee:hover {
+  animation-play-state: paused;
 }
 
-html.light .text-\[\#88aa90\],
-html.light .text-\[\#a0c0a8\] {
-  color: #2b5437 !important;
-}
-
-html.light .border-\[\#00ff66\]\/15,
-html.light .border-\[\#00ff66\]\/20,
-html.light .border-\[\#00ff66\]\/30 {
-  border-color: rgba(0, 168, 67, 0.3) !important;
-}
-
-html.light .crt-scanlines {
-  opacity: 0.15;
-}

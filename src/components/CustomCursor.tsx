@@ -55,29 +55,29 @@ export const CustomCursor: React.FC = () => {
   if (!visible) return null;
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[9999] overflow-hidden">
+    <div className="pointer-events-none fixed inset-0 z-[9999999] overflow-hidden">
       {/* Outer Ring */}
       <div
         className={`fixed flex items-center justify-center rounded-full transition-transform duration-75 ease-out ${
           cursorType === 'search'
-            ? 'w-10 h-10 -ml-5 -mt-5 border border-[#00ff66] bg-[#00ff66]/10 shadow-[0_0_15px_#00ff66]'
+            ? 'w-10 h-10 -ml-5 -mt-5 border border-emerald-600 dark:border-[#00ff66] bg-emerald-600/15 dark:bg-[#00ff66]/10 shadow-[0_0_15px_rgba(16,185,129,0.3)] dark:shadow-[0_0_15px_#00ff66]'
             : cursorType === 'hover'
-            ? 'w-9 h-9 -ml-[18px] -mt-[18px] border border-[#00ff66] bg-[#00ff66]/15 shadow-[0_0_12px_#00ff66]'
-            : 'w-7 h-7 -ml-3.5 -mt-3.5 border border-[#00ff66]/80 bg-transparent shadow-[0_0_8px_rgba(0,255,102,0.4)]'
+            ? 'w-9 h-9 -ml-[18px] -mt-[18px] border border-emerald-600 dark:border-[#00ff66] bg-emerald-600/20 dark:bg-[#00ff66]/15 shadow-[0_0_12px_rgba(16,185,129,0.3)] dark:shadow-[0_0_12px_#00ff66]'
+            : 'w-7 h-7 -ml-3.5 -mt-3.5 border border-emerald-600 dark:border-[#00ff66]/80 bg-transparent shadow-sm dark:shadow-[0_0_8px_rgba(0,255,102,0.4)]'
         }`}
         style={{
           transform: `translate3d(${trailingPos.x}px, ${trailingPos.y}px, 0)`,
         }}
       >
         {cursorType === 'search' ? (
-          <Search className="w-4 h-4 text-[#00ff66] animate-pulse" />
+          <Search className="w-4 h-4 text-emerald-600 dark:text-[#00ff66] animate-pulse" />
         ) : null}
       </div>
 
       {/* Inner Dot (Instant) */}
       {cursorType !== 'search' && (
         <div
-          className="fixed w-1.5 h-1.5 -ml-[3px] -mt-[3px] rounded-full bg-[#00ff66] shadow-[0_0_6px_#00ff66]"
+          className="fixed w-1.5 h-1.5 -ml-[3px] -mt-[3px] rounded-full bg-emerald-600 dark:bg-[#00ff66] shadow-[0_0_6px_rgba(16,185,129,0.5)] dark:shadow-[0_0_6px_#00ff66]"
           style={{
             transform: `translate3d(${pos.x}px, ${pos.y}px, 0)`,
           }}

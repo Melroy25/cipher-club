@@ -15,7 +15,7 @@ export const PublicLayout: React.FC = () => {
   const [isRootAccessOpen, setIsRootAccessOpen] = useState(false);
 
   return (
-    <div className="public-site-cursor min-h-screen bg-[#030804] text-white selection:bg-[#00ff66] selection:text-black relative">
+    <div className="public-site-cursor min-h-screen bg-white dark:bg-[#030804] text-gray-900 dark:text-white font-sans selection:bg-[#00ff66] selection:text-black relative transition-colors duration-200">
       {/* Custom Terminal Cursor */}
       <CustomCursor />
 

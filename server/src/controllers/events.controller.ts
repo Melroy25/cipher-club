@@ -59,6 +59,7 @@ export async function createEvent(req: Request, res: Response) {
       status,
       displayOrder,
       isPublished,
+      featuredOnHome,
       slides,
     } = req.body;
 
@@ -96,6 +97,7 @@ export async function createEvent(req: Request, res: Response) {
         status: status || "UPCOMING",
         displayOrder: displayOrder !== undefined ? Number(displayOrder) : 0,
         isPublished: isPublished !== undefined ? Boolean(isPublished) : true,
+        featuredOnHome: featuredOnHome !== undefined ? Boolean(featuredOnHome) : true,
         ...(Array.isArray(slides) && slides.length > 0
           ? {
               slides: {
@@ -143,6 +145,7 @@ export async function updateEvent(req: Request, res: Response) {
       status,
       displayOrder,
       isPublished,
+      featuredOnHome,
       slides,
     } = req.body;
 
@@ -155,11 +158,12 @@ export async function updateEvent(req: Request, res: Response) {
     // Optional slide recreation if slides array provided
     if (Array.isArray(slides)) {
       await prisma.eventSlide.deleteMany({ where: { eventId: id } });
-      if (slides.length > 0) {
+      const validSlides = slides.filter((s: any) => (typeof s === "string" ? s.trim().length > 0 : Boolean(s?.imageUrl)));
+      if (validSlides.length > 0) {
         await prisma.eventSlide.createMany({
-          data: slides.map((slide: any, index: number) => ({
+          data: validSlides.map((slide: any, index: number) => ({
             eventId: id,
-            imageUrl: typeof slide === "string" ? slide : slide.imageUrl,
+            imageUrl: typeof slide === "string" ? slide.trim() : slide.imageUrl,
             order: typeof slide === "object" && slide.order !== undefined ? Number(slide.order) : index,
             caption: typeof slide === "object" ? slide.caption : null,
           })),
@@ -180,7 +184,9 @@ export async function updateEvent(req: Request, res: Response) {
         ...(description !== undefined && { description }),
         ...(fullDescString !== undefined && { fullDescription: fullDescString }),
         ...(posterUrl !== undefined && { posterUrl }),
-        ...(eventDate !== undefined && { eventDate: eventDate ? new Date(eventDate) : null }),
+        ...(eventDate !== undefined && {
+          eventDate: eventDate && !isNaN(new Date(eventDate).getTime()) ? new Date(eventDate) : null,
+        }),
         ...(startTime !== undefined && { startTime }),
         ...(endTime !== undefined && { endTime }),
         ...(venue !== undefined && { venue }),
@@ -189,6 +195,7 @@ export async function updateEvent(req: Request, res: Response) {
         ...(status !== undefined && { status }),
         ...(displayOrder !== undefined && { displayOrder: Number(displayOrder) }),
         ...(isPublished !== undefined && { isPublished: Boolean(isPublished) }),
+        ...(featuredOnHome !== undefined && { featuredOnHome: Boolean(featuredOnHome) }),
       },
       include: {
         slides: { orderBy: { order: "asc" } },
@@ -197,6 +204,7 @@ export async function updateEvent(req: Request, res: Response) {
 
     return res.json({ success: true, data: event, message: "Event updated successfully." });
   } catch (err) {
+    console.error("Update event error:", err);
     return res.status(500).json({ success: false, message: "Failed to update event." });
   }
 }

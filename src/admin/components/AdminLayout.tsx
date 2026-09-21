@@ -1,4 +1,4 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { Menu, Shield } from "lucide-react";
 import { Sidebar } from "./Sidebar.tsx";
@@ -12,10 +12,12 @@ export const AdminLayout: React.FC = () => {
     if (!path) return "Dashboard Overview";
     const titles: Record<string, string> = {
       members: "Team Members Management",
-      projects: "Projects Management",
       events: "Events & Workshops",
       activities: "Activities Archive",
       domains: "Domains & Pillars",
+      contributors: "Event Contributors",
+      applications: "Join Requests",
+      messages: "Contact Messages",
       content: "Website Content Editor",
       media: "Media Asset Library",
       settings: "Admin Settings",

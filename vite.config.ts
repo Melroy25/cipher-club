@@ -6,8 +6,16 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
+    watch: {
+      ignored: ["**/server/**"],
+    },
     proxy: {
       "/api": {
+        target: "http://localhost:4000",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/uploads": {
         target: "http://localhost:4000",
         changeOrigin: true,
         secure: false,

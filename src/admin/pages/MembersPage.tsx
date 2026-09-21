@@ -1,5 +1,5 @@
-﻿import React, { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Search, Check, X, ArrowUpDown, Eye, EyeOff, Loader2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Plus, Edit2, Trash2, Search, Check, X, ArrowUpDown, Eye, EyeOff, Loader2, Save, Sparkles } from "lucide-react";
 import { Modal } from "../components/Modal.tsx";
 import { ConfirmDialog } from "../components/ConfirmDialog.tsx";
 import { ImageUploader } from "../components/ImageUploader.tsx";
@@ -10,6 +10,7 @@ interface TeamMember {
   name: string;
   role: string;
   department: string;
+  teamYear: string;
   bio?: string | null;
   photoUrl: string;
   modalPhotoUrl?: string | null;
@@ -32,11 +33,22 @@ export const MembersPage: React.FC = () => {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Team Page Header Configuration State
+  const [headerTitle, setHeaderTitle] = useState("Core Team");
+  const [headerSubtitle, setHeaderSubtitle] = useState(
+    "The minds shaping Cipher Club's tech culture at SJEC — elected officers and domain leads driving every initiative."
+  );
+  const [headerPastSubtitle, setHeaderPastSubtitle] = useState(
+    "Former office bearers and alumni domain leads who guided the Cipher student association."
+  );
+  const [isSavingHeader, setIsSavingHeader] = useState(false);
+
   // Form State
   const [formData, setFormData] = useState({
     name: "",
     role: "",
     department: "Computer Science & Engineering",
+    teamYear: "2025-26",
     bio: "",
     photoUrl: "",
     modalPhotoUrl: "",
@@ -49,6 +61,46 @@ export const MembersPage: React.FC = () => {
   });
 
   const { success, error } = useToast();
+
+  const loadHeaderSettings = async () => {
+    try {
+      const res = await fetch("/api/public/content");
+      const data = await res.json();
+      if (res.ok && data.map) {
+        if (data.map.team_title) setHeaderTitle(data.map.team_title);
+        if (data.map.team_subtitle) setHeaderSubtitle(data.map.team_subtitle);
+        if (data.map.team_past_subtitle) setHeaderPastSubtitle(data.map.team_past_subtitle);
+      }
+    } catch {}
+  };
+
+  const saveHeaderSettings = async () => {
+    try {
+      setIsSavingHeader(true);
+      const res = await fetch("/api/admin/content/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+          items: [
+            { key: "team_title", value: headerTitle, section: "team", label: "Team Main Heading" },
+            { key: "team_subtitle", value: headerSubtitle, section: "team", label: "Team Subtitle Description" },
+            { key: "team_past_subtitle", value: headerPastSubtitle, section: "team", label: "Past Team Subtitle Description" },
+          ],
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        success("Team page header updated successfully!");
+      } else {
+        error(data.message || "Failed to update header.");
+      }
+    } catch {
+      error("Network error updating header.");
+    } finally {
+      setIsSavingHeader(false);
+    }
+  };
 
   const loadMembers = async () => {
     try {
@@ -69,6 +121,7 @@ export const MembersPage: React.FC = () => {
 
   useEffect(() => {
     loadMembers();
+    loadHeaderSettings();
   }, []);
 
   const openAddModal = () => {
@@ -77,12 +130,13 @@ export const MembersPage: React.FC = () => {
       name: "",
       role: "",
       department: "Computer Science & Engineering",
+      teamYear: "2025-26",
       bio: "",
       photoUrl: "",
       modalPhotoUrl: "",
-      instagram: "https://instagram.com",
-      github: "https://github.com",
-      linkedin: "https://linkedin.com",
+      instagram: "",
+      github: "",
+      linkedin: "",
       otherUrl: "",
       displayOrder: members.length + 1,
       isActive: true,
@@ -96,6 +150,7 @@ export const MembersPage: React.FC = () => {
       name: member.name,
       role: member.role,
       department: member.department,
+      teamYear: member.teamYear || "2025-26",
       bio: member.bio || "",
       photoUrl: member.photoUrl,
       modalPhotoUrl: member.modalPhotoUrl || "",
@@ -182,11 +237,16 @@ export const MembersPage: React.FC = () => {
     }
   };
 
+  const [yearFilter, setYearFilter] = useState("ALL");
+
+  const availableYears = ["ALL", ...Array.from(new Set(members.map((m) => m.teamYear || "2025-26"))).sort((a, b) => b.localeCompare(a))];
+
   const filteredMembers = members.filter(
     (m) =>
-      m.name.toLowerCase().includes(search.toLowerCase()) ||
-      m.role.toLowerCase().includes(search.toLowerCase()) ||
-      m.department.toLowerCase().includes(search.toLowerCase())
+      (yearFilter === "ALL" || (m.teamYear || "2025-26") === yearFilter) &&
+      (m.name.toLowerCase().includes(search.toLowerCase()) ||
+        m.role.toLowerCase().includes(search.toLowerCase()) ||
+        m.department.toLowerCase().includes(search.toLowerCase()))
   );
 
   return (
@@ -196,7 +256,7 @@ export const MembersPage: React.FC = () => {
         <div>
           <h2 className="text-xl font-bold font-mono text-white">Team Members &amp; Leadership</h2>
           <p className="font-mono text-xs text-[#88aa90]">
-            Manage leadership roster, designations, biographies, and photos
+            Manage leadership roster by team year — assign each member to their academic year
           </p>
         </div>
         <button
@@ -207,7 +267,92 @@ export const MembersPage: React.FC = () => {
         </button>
       </div>
 
-      {/* Filter / Search Bar */}
+      {/* ── Public Team Page Header Configuration Card ────────────────────── */}
+      <div className="bg-[#030905] border border-[#00ff66]/25 rounded-2xl p-5 md:p-6 shadow-lg">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-[#00ff66]/15">
+          <div>
+            <h3 className="text-sm sm:text-base font-bold font-mono text-[#00ff66] flex items-center gap-2">
+              <Sparkles className="w-4 h-4" />
+              Public Team Page Header Text
+            </h3>
+            <p className="font-mono text-xs text-[#88aa90]">
+              Customize the heading title and subtitle description displayed above team rosters on the public Team page
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={saveHeaderSettings}
+            disabled={isSavingHeader}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-mono text-xs font-bold transition-all shadow-[0_0_15px_rgba(0,255,102,0.25)] hover:shadow-[0_0_20px_rgba(0,255,102,0.4)] disabled:opacity-50 shrink-0"
+          >
+            {isSavingHeader ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+            Save Header Text
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block font-mono text-xs text-[#88aa90] uppercase mb-1">
+              Main Heading Title
+            </label>
+            <input
+              type="text"
+              value={headerTitle}
+              onChange={(e) => setHeaderTitle(e.target.value)}
+              placeholder="e.g. Core Team"
+              className="w-full bg-[#020603] border border-[#00ff66]/30 focus:border-[#00ff66] rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
+            />
+            <p className="mt-1 font-mono text-[10px] text-[#88aa90]">
+              Year badge (e.g. 2025–26) is attached automatically
+            </p>
+          </div>
+
+          <div>
+            <label className="block font-mono text-xs text-[#88aa90] uppercase mb-1">
+              Current Year Subtitle Description
+            </label>
+            <textarea
+              rows={2}
+              value={headerSubtitle}
+              onChange={(e) => setHeaderSubtitle(e.target.value)}
+              placeholder="The minds shaping Cipher Club's tech culture at SJEC..."
+              className="w-full bg-[#020603] border border-[#00ff66]/30 focus:border-[#00ff66] rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label className="block font-mono text-xs text-[#88aa90] uppercase mb-1">
+              Past Years Subtitle Description
+            </label>
+            <textarea
+              rows={2}
+              value={headerPastSubtitle}
+              onChange={(e) => setHeaderPastSubtitle(e.target.value)}
+              placeholder="Former office bearers and alumni domain leads who guided the Cipher student association..."
+              className="w-full bg-[#020603] border border-[#00ff66]/30 focus:border-[#00ff66] rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Year Filter Tabs */}
+      <div className="flex items-center gap-2 flex-wrap">
+        {availableYears.map((yr) => (
+          <button
+            key={yr}
+            onClick={() => setYearFilter(yr)}
+            className={`px-3.5 py-1.5 rounded-lg font-mono text-xs tracking-wider transition-all border ${
+              yearFilter === yr
+                ? "bg-[#00ff66] text-black border-[#00ff66] font-bold shadow-[0_0_12px_rgba(0,255,102,0.3)]"
+                : "bg-[#041006] text-[#88aa90] border-[#00ff66]/20 hover:text-[#00ff66] hover:border-[#00ff66]/50"
+            }`}
+          >
+            {yr === "ALL" ? "All Years" : yr}
+          </button>
+        ))}
+      </div>
+
+      {/* Search Bar */}
       <div className="flex items-center gap-4 bg-[#030905] p-3 rounded-xl border border-[#00ff66]/20">
         <div className="relative flex-1 flex items-center">
           <Search className="w-4 h-4 text-[#88aa90] absolute left-3 pointer-events-none" />
@@ -249,6 +394,7 @@ export const MembersPage: React.FC = () => {
                   <th className="p-4 w-12">#</th>
                   <th className="p-4">Member</th>
                   <th className="p-4">Designation</th>
+                  <th className="p-4">Year</th>
                   <th className="p-4">Socials</th>
                   <th className="p-4 text-center">Order</th>
                   <th className="p-4 text-center">Status</th>
@@ -281,10 +427,15 @@ export const MembersPage: React.FC = () => {
                       </span>
                     </td>
                     <td className="p-4">
-                      <div className="flex items-center gap-2 text-[#88aa90]">
-                        {m.github && (
+                      <span className="px-2 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-[10px] tracking-wider">
+                        {m.teamYear || "2025-26"}
+                      </span>
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center gap-2 text-xs font-mono text-[#88aa90]">
+                        {m.github && m.github.trim() && (
                           <a
-                            href={m.github}
+                            href={m.github.trim()}
                             target="_blank"
                             rel="noreferrer"
                             className="hover:text-[#00ff66]"
@@ -292,9 +443,9 @@ export const MembersPage: React.FC = () => {
                             GH
                           </a>
                         )}
-                        {m.linkedin && (
+                        {m.linkedin && m.linkedin.trim() && (
                           <a
-                            href={m.linkedin}
+                            href={m.linkedin.trim()}
                             target="_blank"
                             rel="noreferrer"
                             className="hover:text-[#00ff66]"
@@ -302,15 +453,18 @@ export const MembersPage: React.FC = () => {
                             LI
                           </a>
                         )}
-                        {m.instagram && (
+                        {m.instagram && m.instagram.trim() && (
                           <a
-                            href={m.instagram}
+                            href={m.instagram.trim()}
                             target="_blank"
                             rel="noreferrer"
                             className="hover:text-[#00ff66]"
                           >
                             IG
                           </a>
+                        )}
+                        {!m.github?.trim() && !m.linkedin?.trim() && !m.instagram?.trim() && (
+                          <span className="text-[#88aa90]/40">-</span>
                         )}
                       </div>
                     </td>
@@ -393,7 +547,7 @@ export const MembersPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block font-mono text-xs text-[#00ff66] uppercase mb-1">
                 Department
@@ -404,6 +558,21 @@ export const MembersPage: React.FC = () => {
                 onChange={(e) => setFormData({ ...formData, department: e.target.value })}
                 className="w-full bg-[#020603] border border-[#00ff66]/30 focus:border-[#00ff66] rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
               />
+            </div>
+
+            <div>
+              <label className="block font-mono text-xs text-cyan-400 uppercase mb-1">
+                Team Year *
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.teamYear}
+                onChange={(e) => setFormData({ ...formData, teamYear: e.target.value })}
+                placeholder="e.g. 2025-26"
+                className="w-full bg-[#020603] border border-cyan-500/30 focus:border-cyan-400 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none"
+              />
+              <p className="text-[10px] font-mono text-[#88aa90] mt-1">Academic year (e.g. 2025-26)</p>
             </div>
 
             <div>

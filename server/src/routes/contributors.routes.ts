@@ -35,9 +35,11 @@ router.post("/admin/contributors", requireAuth, async (req: Request, res: Respon
       name,
       role,
       eventName,
+      teamName,
       department,
       batch,
       photoUrl,
+      modalPhotoUrl,
       bio,
       github,
       linkedin,
@@ -46,18 +48,21 @@ router.post("/admin/contributors", requireAuth, async (req: Request, res: Respon
       isPublished,
     } = req.body;
 
-    if (!name || !role || !eventName) {
-      return res.status(400).json({ success: false, error: "name, role, and eventName are required" });
+    const resolvedTeamName = (teamName || eventName || "").trim();
+
+    if (!name || !role || !resolvedTeamName) {
+      return res.status(400).json({ success: false, error: "name, role, and teamName are required" });
     }
 
     const item = await prisma.contributor.create({
       data: {
         name,
         role,
-        eventName,
+        eventName: resolvedTeamName,
         department: department || "Computer Science & Engineering",
         batch: batch || null,
         photoUrl: photoUrl || null,
+        modalPhotoUrl: modalPhotoUrl || null,
         bio: bio || null,
         github: github || null,
         linkedin: linkedin || null,
@@ -79,9 +84,11 @@ router.put("/admin/contributors/:id", requireAuth, async (req: Request, res: Res
       name,
       role,
       eventName,
+      teamName,
       department,
       batch,
       photoUrl,
+      modalPhotoUrl,
       bio,
       github,
       linkedin,
@@ -90,15 +97,18 @@ router.put("/admin/contributors/:id", requireAuth, async (req: Request, res: Res
       isPublished,
     } = req.body;
 
+    const resolvedTeamName = teamName !== undefined ? teamName : eventName;
+
     const item = await prisma.contributor.update({
       where: { id },
       data: {
         ...(name !== undefined && { name }),
         ...(role !== undefined && { role }),
-        ...(eventName !== undefined && { eventName }),
+        ...(resolvedTeamName !== undefined && { eventName: resolvedTeamName }),
         ...(department !== undefined && { department }),
         ...(batch !== undefined && { batch: batch || null }),
         ...(photoUrl !== undefined && { photoUrl: photoUrl || null }),
+        ...(modalPhotoUrl !== undefined && { modalPhotoUrl: modalPhotoUrl || null }),
         ...(bio !== undefined && { bio: bio || null }),
         ...(github !== undefined && { github: github || null }),
         ...(linkedin !== undefined && { linkedin: linkedin || null }),

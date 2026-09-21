@@ -1,6 +1,7 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Code2, Crown, Users, Rocket, Cpu, Terminal, Shield, Sparkles } from 'lucide-react';
 import { useScrambleText } from '../hooks/useScrambleText.ts';
+import { useTheme } from '../context/ThemeContext.tsx';
 
 const ICON_MAP: Record<string, React.ComponentType<{ className?: string }>> = {
   Code2,
@@ -48,6 +49,7 @@ const DEFAULT_DOMAIN_DATA: DomainItem[] = [
 ];
 
 export const Domains: React.FC = () => {
+  const { theme } = useTheme();
   const { displayText, ref } = useScrambleText("Our Domains");
   const [domains, setDomains] = useState<DomainItem[]>(DEFAULT_DOMAIN_DATA);
 
@@ -77,12 +79,13 @@ export const Domains: React.FC = () => {
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         
         <div className="mb-12">
-          <div className="font-mono text-sm tracking-widest text-[#00ff66] mb-3">
+          <div className="font-mono text-sm tracking-widest text-emerald-600 dark:text-[#00ff66] mb-3 font-bold">
             // WHAT WE DO
           </div>
           <h2
             ref={ref}
-            className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-white text-glow"
+            className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight font-sans dark:text-glow text-black dark:text-white"
+            style={{ color: theme === "dark" ? "#ffffff" : "#000000" }}
           >
             {displayText}
           </h2>
@@ -95,26 +98,32 @@ export const Domains: React.FC = () => {
             return (
               <div
                 key={idx}
-                className="group relative rounded-xl p-8 bg-[#08160c]/70 backdrop-blur-md border border-[#00ff66]/15 hover:border-[#00ff66]/60 transition-all duration-300 hover:shadow-[0_0_25px_rgba(0,255,102,0.18)] hover:-translate-y-1"
+                className="group relative rounded-xl p-8 bg-white dark:bg-[#08160c]/70 backdrop-blur-md border border-gray-200 dark:border-[#00ff66]/15 hover:border-emerald-500 dark:hover:border-[#00ff66]/60 transition-all duration-300 shadow-sm hover:shadow-xl dark:shadow-none dark:hover:shadow-[0_0_25px_rgba(0,255,102,0.18)] hover:-translate-y-1"
               >
                 {/* Top Row: Icon + Badge */}
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-12 h-12 rounded-lg bg-[#00ff66]/10 border border-[#00ff66]/30 flex items-center justify-center text-[#00ff66] group-hover:bg-[#00ff66] group-hover:text-black transition-all duration-300 group-hover:shadow-[0_0_15px_#00ff66]">
+                  <div className="w-12 h-12 rounded-lg bg-emerald-50 dark:bg-[#00ff66]/10 border border-emerald-200 dark:border-[#00ff66]/30 flex items-center justify-center text-emerald-600 dark:text-[#00ff66] group-hover:bg-emerald-600 group-hover:text-white dark:group-hover:bg-[#00ff66] dark:group-hover:text-black transition-all duration-300">
                     <Icon className="w-6 h-6" />
                   </div>
                   
-                  <span className="font-mono text-xs tracking-widest text-[#00ff66] font-semibold px-2.5 py-1 rounded bg-[#00ff66]/5 border border-[#00ff66]/20">
+                  <span className="font-sans text-xs tracking-wider text-emerald-700 dark:text-[#00ff66] font-bold px-2.5 py-1 rounded bg-emerald-50 dark:bg-[#00ff66]/5 border border-emerald-200 dark:border-[#00ff66]/20 uppercase">
                     {domain.sessions}
                   </span>
                 </div>
 
                 {/* Title */}
-                <h3 className="text-xl sm:text-2xl font-bold text-white mb-3 group-hover:text-[#00ff66] transition-colors">
+                <h3
+                  className="text-xl sm:text-2xl font-bold mb-3 font-sans group-hover:text-emerald-600 dark:group-hover:text-[#00ff66] transition-colors text-black dark:text-white"
+                  style={{ color: theme === "dark" ? "#ffffff" : "#000000" }}
+                >
                   {domain.title}
                 </h3>
 
                 {/* Description */}
-                <p className="font-mono text-sm sm:text-base text-[#a0c0a8] leading-relaxed">
+                <p
+                  className="font-sans text-sm sm:text-base leading-relaxed text-gray-800 dark:text-[#c4ded0]"
+                  style={{ color: theme === "dark" ? "#c4ded0" : "#2d3748" }}
+                >
                   {domain.description}
                 </p>
               </div>

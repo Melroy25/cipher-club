@@ -1,23 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
-  Mail, ArrowUp, Copy, Check, Terminal, Shield, Sparkles,
-  ExternalLink, ChevronRight, Heart, Users,
+  Mail, Terminal, Heart,
 } from "lucide-react";
 import { GithubIcon, LinkedinIcon, InstagramIcon } from "./Icons.tsx";
+import { useTheme } from "../context/ThemeContext.tsx";
 
 interface FooterProps {
   onOpenRootAccess?: () => void;
   onOpenJoinModal?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onOpenRootAccess, onOpenJoinModal }) => {
+export const Footer: React.FC<FooterProps> = () => {
+  const { theme } = useTheme();
+  const isDark = theme === "dark";
+
   const [email, setEmail] = useState("cipher@sjec.ac.in");
   const [linkedin, setLinkedin] = useState("https://linkedin.com");
   const [github, setGithub] = useState("https://github.com");
   const [instagram, setInstagram] = useState("https://instagram.com");
-  const [copyright, setCopyright] = useState("> © 2026 CIPHER SJEC.");
-  const [copied, setCopied] = useState(false);
+  const [copyright, setCopyright] = useState("© 2026 CIPHER SJEC. All Rights Reserved.");
+  const [logoUrl, setLogoUrl] = useState("/assets/logo.png");
 
   useEffect(() => {
     async function fetchContent() {
@@ -31,6 +34,7 @@ export const Footer: React.FC<FooterProps> = ({ onOpenRootAccess, onOpenJoinModa
             if (json.map.github_url) setGithub(json.map.github_url);
             if (json.map.instagram_url) setInstagram(json.map.instagram_url);
             if (json.map.footer_copyright) setCopyright(json.map.footer_copyright);
+            if (json.map.site_logo_url) setLogoUrl(json.map.site_logo_url);
           }
         }
       } catch {}
@@ -38,253 +42,202 @@ export const Footer: React.FC<FooterProps> = ({ onOpenRootAccess, onOpenJoinModa
     fetchContent();
   }, []);
 
-  const copyEmail = () => {
-    navigator.clipboard.writeText(email);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   return (
-    <footer className="relative border-t border-[#00ff66]/15 bg-[#020603] pt-16 pb-12 overflow-hidden select-none font-mono">
-      {/* Background ambient glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-[#00ff66]/5 blur-3xl pointer-events-none" />
+    <footer
+      className={`relative w-full border-t transition-colors duration-300 font-sans select-none ${
+        isDark
+          ? "bg-[#020703] border-[#00ff66]/15 text-white"
+          : "bg-white border-gray-200 text-gray-900"
+      }`}
+    >
+      {/* Subtle top ambient glow in dark mode */}
+      {isDark && (
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-24 bg-[#00ff66]/5 blur-3xl pointer-events-none" />
+      )}
 
-      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
-        {/* ── Top Hero Callout (Unique to Cipher) ──────────────── */}
-        <div className="mb-16 p-8 md:p-12 rounded-2xl bg-gradient-to-br from-[#041006] via-[#020703] to-[#041508] border border-[#00ff66]/25 relative overflow-hidden shadow-[0_0_40px_rgba(0,255,102,0.08)]">
-          {/* Accent corner reticles */}
-          <div className="absolute top-2 left-2 w-3 h-3 border-t-2 border-l-2 border-[#00ff66]/40" />
-          <div className="absolute top-2 right-2 w-3 h-3 border-t-2 border-r-2 border-[#00ff66]/40" />
-          <div className="absolute bottom-2 left-2 w-3 h-3 border-b-2 border-l-2 border-[#00ff66]/40" />
-          <div className="absolute bottom-2 right-2 w-3 h-3 border-b-2 border-r-2 border-[#00ff66]/40" />
-
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-            <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#00ff66]/10 border border-[#00ff66]/30 text-[#00ff66] text-xs tracking-widest uppercase mb-4">
-                <Terminal className="w-3.5 h-3.5" />
-                <span>COMMUNICATION CHANNEL</span>
-              </div>
-
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white tracking-tight leading-tight mb-3">
-                SHAPING TOMORROW'S ENGINEERS, HACKERS &amp; BUILDERS.
-              </h2>
-              <p className="text-xs md:text-sm text-[#88aa90] leading-relaxed">
-                Have an initiative, workshop idea, or campus sponsorship in mind? Let's engineer something extraordinary together.
-              </p>
+      {/* Main Full-Width Content Container */}
+      <div className="max-w-7xl mx-auto px-6 md:px-12 pt-16 pb-12 relative z-10">
+        
+        {/* ── Top Row: Left Narrative & Right Navigation Columns ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+          
+          {/* Left Side: Shaping Tomorrow's Engineers */}
+          <div className="lg:col-span-6 space-y-6">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-mono font-semibold tracking-wider uppercase border w-fit bg-emerald-50 dark:bg-[#00ff66]/10 border-emerald-200 dark:border-[#00ff66]/30 text-emerald-700 dark:text-[#00ff66]">
+              <Terminal className="w-3.5 h-3.5" />
+              <span>COMMUNICATION CHANNEL</span>
             </div>
 
-            {/* Email Contact Action Box */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
-              <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-[#020703] border border-[#00ff66]/30 text-white text-xs">
-                <a
-                  href={`mailto:${email}`}
-                  className="flex items-center gap-2 text-[#00ff66] hover:underline font-bold"
-                  title="Open mail client"
-                >
-                  <Mail className="w-4 h-4 text-[#00ff66]" />
-                  <span>{email}</span>
-                </a>
-                <button
-                  onClick={copyEmail}
-                  className="p-1 rounded text-[#88aa90] hover:text-[#00ff66] transition-colors ml-2"
-                  title="Copy email to clipboard"
-                >
-                  {copied ? <Check className="w-4 h-4 text-[#00ff66]" /> : <Copy className="w-4 h-4" />}
-                </button>
-              </div>
+            <h2
+              className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight font-sans"
+              style={{ color: isDark ? "#ffffff" : "#000000" }}
+            >
+              SHAPING TOMORROW'S ENGINEERS, HACKERS &amp; BUILDERS.
+            </h2>
 
-              <a
-                href={`mailto:${email}?subject=CIPHER%20Collaboration%20Inquiry`}
-                className="px-6 py-3 rounded-xl bg-[#00ff66] text-black font-bold text-xs tracking-wider uppercase hover:bg-[#00ff66]/90 transition-all shadow-[0_0_20px_rgba(0,255,102,0.35)] flex items-center justify-center gap-2 text-center"
-              >
-                <span>SEND MESSAGE</span>
-                <ChevronRight className="w-4 h-4" />
-              </a>
-            </div>
-          </div>
-
-          {/* System status tag */}
-          <div className="mt-6 pt-6 border-t border-[#00ff66]/15 flex flex-wrap items-center gap-4 text-[11px] text-[#88aa90]">
-            <span className="flex items-center gap-1.5 text-[#00ff66]">
-              <span className="w-2 h-2 rounded-full bg-[#00ff66] animate-pulse" />
-              SYSTEM ACTIVE
-            </span>
-            <span>•</span>
-            <span>ST JOSEPH ENGINEERING COLLEGE</span>
-            <span>•</span>
-            <span>DEPARTMENT OF COMPUTER SCIENCE &amp; ENGINEERING</span>
-          </div>
-        </div>
-
-        {/* ── Main Multi-Column Links Section ─────────────────── */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-14">
-          {/* Col 1: Brand Info */}
-          <div className="lg:col-span-2 space-y-4">
-            <div className="flex items-center gap-3">
-              <img src="/assets/logo.png" alt="Cipher Logo" className="w-8 h-8 object-contain" />
-              <h3 className="text-2xl font-extrabold tracking-wider text-[#00ff66] text-glow">
-                CIPHER
-              </h3>
-            </div>
-            <p className="text-xs text-[#88aa90] leading-relaxed max-w-md">
-              The premier student association of the Department of Computer Science &amp; Engineering at St Joseph Engineering College, Vamanjoor, Mangaluru. Fostering technical excellence, hackathons, and collaborative software engineering.
+            <p
+              className="text-base sm:text-lg leading-relaxed max-w-xl"
+              style={{ color: isDark ? "#a0c0a8" : "#4b5563" }}
+            >
+              Have an initiative, workshop idea, or campus sponsorship in mind? Let us engineer something extraordinary together.
             </p>
 
-            {/* Social Icons */}
-            <div className="flex items-center gap-3 pt-2">
-              <a
-                href={`mailto:${email}`}
-                aria-label="Email"
-                className="w-9 h-9 rounded-lg border border-[#00ff66]/30 hover:border-[#00ff66] hover:bg-[#00ff66]/10 flex items-center justify-center text-[#00ff66] transition-all hover:shadow-[0_0_15px_rgba(0,255,102,0.3)]"
-              >
-                <Mail className="w-4 h-4" />
-              </a>
-              <a
-                href={linkedin}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="LinkedIn"
-                className="w-9 h-9 rounded-lg border border-[#00ff66]/30 hover:border-[#00ff66] hover:bg-[#00ff66]/10 flex items-center justify-center text-[#00ff66] transition-all hover:shadow-[0_0_15px_rgba(0,255,102,0.3)]"
-              >
-                <LinkedinIcon className="w-4 h-4" />
-              </a>
-              <a
-                href={github}
-                target="_blank"
-                rel="noreferrer"
-                aria-label="GitHub"
-                className="w-9 h-9 rounded-lg border border-[#00ff66]/30 hover:border-[#00ff66] hover:bg-[#00ff66]/10 flex items-center justify-center text-[#00ff66] transition-all hover:shadow-[0_0_15px_rgba(0,255,102,0.3)]"
-              >
-                <GithubIcon className="w-4 h-4" />
-              </a>
+            {/* Status Pills */}
+            <div className="flex flex-wrap items-center gap-3 text-xs sm:text-sm font-mono pt-2" style={{ color: isDark ? "#88aa90" : "#6b7280" }}>
+              <span className="flex items-center gap-2 text-emerald-600 dark:text-[#00ff66] font-semibold">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-[#00ff66] animate-pulse" />
+                SYSTEM ACTIVE
+              </span>
+              <span>•</span>
+              <span>ST JOSEPH ENGINEERING COLLEGE</span>
+              <span>•</span>
+              <span>DEPT. OF CSE</span>
+            </div>
+          </div>
+
+          {/* Right Side: Bigger, Prominent Menu Columns */}
+          <div className="lg:col-span-6 grid grid-cols-2 gap-10 sm:gap-16 pt-2 lg:pt-4">
+            
+            {/* Column 1: Explore */}
+            <div>
+              <h3 className="text-sm sm:text-base font-mono font-bold uppercase tracking-widest text-emerald-700 dark:text-[#00ff66] mb-5 sm:mb-6">
+                // EXPLORE
+              </h3>
+              <ul className="space-y-4 sm:space-y-5 text-sm sm:text-base font-sans font-medium" style={{ color: isDark ? "#88aa90" : "#4b5563" }}>
+                <li>
+                  <Link to="/" className="hover:text-emerald-600 dark:hover:text-[#00ff66] hover:translate-x-1.5 transition-all inline-flex items-center gap-2">
+                    <span className="text-emerald-600 dark:text-[#00ff66] font-bold">&gt;</span> Home
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/about" className="hover:text-emerald-600 dark:hover:text-[#00ff66] hover:translate-x-1.5 transition-all inline-flex items-center gap-2">
+                    <span className="text-emerald-600 dark:text-[#00ff66] font-bold">&gt;</span> About
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/events" className="hover:text-emerald-600 dark:hover:text-[#00ff66] hover:translate-x-1.5 transition-all inline-flex items-center gap-2">
+                    <span className="text-emerald-600 dark:text-[#00ff66] font-bold">&gt;</span> Events
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 2: Initiatives */}
+            <div>
+              <h3 className="text-sm sm:text-base font-mono font-bold uppercase tracking-widest text-emerald-700 dark:text-[#00ff66] mb-5 sm:mb-6">
+                // INITIATIVES
+              </h3>
+              <ul className="space-y-4 sm:space-y-5 text-sm sm:text-base font-sans font-medium" style={{ color: isDark ? "#88aa90" : "#4b5563" }}>
+                <li>
+                  <Link to="/team" className="hover:text-emerald-600 dark:hover:text-[#00ff66] hover:translate-x-1.5 transition-all inline-flex items-center gap-2">
+                    <span className="text-emerald-600 dark:text-[#00ff66] font-bold">&gt;</span> Team
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/contact" className="hover:text-emerald-600 dark:hover:text-[#00ff66] hover:translate-x-1.5 transition-all inline-flex items-center gap-2 text-emerald-700 dark:text-[#00ff66] font-bold">
+                    <span className="text-emerald-600 dark:text-[#00ff66] font-bold">&gt;</span> Join / Contact
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/contributors" className="hover:text-emerald-600 dark:hover:text-[#00ff66] hover:translate-x-1.5 transition-all inline-flex items-center gap-2">
+                    <Heart className="w-4 h-4 text-emerald-600 dark:text-[#00ff66]" /> Contributors
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* ── Below the Line: Social Logos & (Full Cipher Logo + Copyright) ── */}
+        <div className="mt-14 pt-8 border-t border-gray-200 dark:border-[#00ff66]/15 flex flex-col sm:flex-row items-center justify-between gap-6">
+          
+          {/* Left: Social Icons (Insta, Mail, LinkedIn, GitHub) */}
+          <div className="flex items-center gap-3.5">
+            {instagram && (
               <a
                 href={instagram}
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Instagram"
-                className="w-9 h-9 rounded-lg border border-[#00ff66]/30 hover:border-[#00ff66] hover:bg-[#00ff66]/10 flex items-center justify-center text-[#00ff66] transition-all hover:shadow-[0_0_15px_rgba(0,255,102,0.3)]"
+                className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${
+                  isDark
+                    ? "border-[#00ff66]/30 hover:border-[#00ff66] hover:bg-[#00ff66]/10 text-[#00ff66]"
+                    : "border-gray-300 hover:border-emerald-500 hover:bg-emerald-50 text-gray-700"
+                }`}
               >
                 <InstagramIcon className="w-4 h-4" />
               </a>
+            )}
+
+            {email && (
+              <a
+                href={`mailto:${email}`}
+                aria-label="Email"
+                className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${
+                  isDark
+                    ? "border-[#00ff66]/30 hover:border-[#00ff66] hover:bg-[#00ff66]/10 text-[#00ff66]"
+                    : "border-gray-300 hover:border-emerald-500 hover:bg-emerald-50 text-gray-700"
+                }`}
+              >
+                <Mail className="w-4 h-4" />
+              </a>
+            )}
+
+            {linkedin && (
+              <a
+                href={linkedin}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="LinkedIn"
+                className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${
+                  isDark
+                    ? "border-[#00ff66]/30 hover:border-[#00ff66] hover:bg-[#00ff66]/10 text-[#00ff66]"
+                    : "border-gray-300 hover:border-emerald-500 hover:bg-emerald-50 text-gray-700"
+                }`}
+              >
+                <LinkedinIcon className="w-4 h-4" />
+              </a>
+            )}
+
+            {github && (
+              <a
+                href={github}
+                target="_blank"
+                rel="noreferrer"
+                aria-label="GitHub"
+                className={`w-10 h-10 rounded-xl border flex items-center justify-center transition-all ${
+                  isDark
+                    ? "border-[#00ff66]/30 hover:border-[#00ff66] hover:bg-[#00ff66]/10 text-[#00ff66]"
+                    : "border-gray-300 hover:border-emerald-500 hover:bg-emerald-50 text-gray-700"
+                }`}
+              >
+                <GithubIcon className="w-4 h-4" />
+              </a>
+            )}
+          </div>
+
+          {/* Right: Full Cipher Logo & Bigger Copyright */}
+          <div className="flex flex-col items-center sm:items-end gap-2">
+            <div className="flex items-center gap-3">
+              <img
+                src={logoUrl}
+                alt="Cipher Logo"
+                className="h-10 sm:h-12 w-auto object-contain drop-shadow-md dark:drop-shadow-[0_0_14px_rgba(0,255,102,0.7)]"
+                onError={() => setLogoUrl("/assets/logo.png")}
+              />
+              <span className="font-sans font-black text-base sm:text-lg tracking-wider text-black dark:text-[#00ff66]">
+                CIPHER
+              </span>
             </div>
-          </div>
-
-          {/* Col 2: Navigation Menu */}
-          <div>
-            <h4 className="text-xs font-bold text-white tracking-widest uppercase mb-4 text-[#00ff66]">
-              // NAVIGATION
-            </h4>
-            <ul className="space-y-2.5 text-xs text-[#88aa90]">
-              <li>
-                <Link to="/" className="hover:text-[#00ff66] transition-colors flex items-center gap-1.5">
-                  <span className="text-[#00ff66]/60">&gt;</span> Home
-                </Link>
-              </li>
-              <li>
-                <Link to="/about" className="hover:text-[#00ff66] transition-colors flex items-center gap-1.5">
-                  <span className="text-[#00ff66]/60">&gt;</span> About Association
-                </Link>
-              </li>
-              <li>
-                <Link to="/events" className="hover:text-[#00ff66] transition-colors flex items-center gap-1.5">
-                  <span className="text-[#00ff66]/60">&gt;</span> Events &amp; Workshops
-                </Link>
-              </li>
-              <li>
-                <Link to="/team" className="hover:text-[#00ff66] transition-colors flex items-center gap-1.5">
-                  <span className="text-[#00ff66]/60">&gt;</span> Leadership Team
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="hover:text-[#00ff66] transition-colors flex items-center gap-1.5 text-[#00ff66]">
-                  <span className="text-[#00ff66]/60">&gt;</span> Join / Contact
-                </Link>
-              </li>
-              <li>
-                <Link to="/blog" className="hover:text-[#00ff66] transition-colors flex items-center gap-1.5">
-                  <span className="text-[#00ff66]/60">&gt;</span> Technical Blog
-                </Link>
-              </li>
-              <li>
-                <Link to="/contributors" className="hover:text-[#00ff66] transition-colors flex items-center gap-1.5 text-[#00ff66] font-semibold">
-                  <Heart className="w-3 h-3 text-[#00ff66]" /> Event Contributors
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Col 3: Community & Access */}
-          <div>
-            <h4 className="text-xs font-bold text-white tracking-widest uppercase mb-4 text-[#00ff66]">
-              // COMMUNITY &amp; ACCESS
-            </h4>
-            <ul className="space-y-2.5 text-xs text-[#88aa90]">
-              <li>
-                <button
-                  onClick={onOpenJoinModal}
-                  className="hover:text-[#00ff66] transition-colors flex items-center gap-1.5 text-left text-[#00ff66] font-semibold"
-                >
-                  <Sparkles className="w-3 h-3 text-[#00ff66]" /> Join CIPHER
-                </button>
-              </li>
-              <li>
-                <Link to="/contributors" className="hover:text-[#00ff66] transition-colors flex items-center gap-1.5">
-                  <Users className="w-3 h-3" /> Hall of Recognition
-                </Link>
-              </li>
-              <li>
-                <a
-                  href={`mailto:${email}?subject=CIPHER%20Contact`}
-                  className="hover:text-[#00ff66] transition-colors flex items-center gap-1.5"
-                >
-                  <Mail className="w-3 h-3" /> Contact Coordinators
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://sjec.ac.in"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-[#00ff66] transition-colors flex items-center gap-1.5"
-                >
-                  <ExternalLink className="w-3 h-3" /> SJEC Official Portal
-                </a>
-              </li>
-              <li>
-                <button
-                  onClick={onOpenRootAccess}
-                  className="hover:text-[#00ff66] transition-colors flex items-center gap-1.5 text-left"
-                >
-                  <Shield className="w-3 h-3 text-[#00ff66]" /> Root Admin Access
-                </button>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* ── Bottom Bar ───────────────────────────────────────── */}
-        <div className="pt-8 border-t border-[#00ff66]/15 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#88aa90]">
-          <div>{copyright}</div>
-
-          <div className="flex items-center gap-6">
-            <span className="text-[11px] text-[#88aa90]/60">
-              ST JOSEPH ENGINEERING COLLEGE · MANGALURU
+            <span className="text-xs sm:text-sm font-mono tracking-tight" style={{ color: isDark ? "#88aa90" : "#6b7280" }}>
+              {copyright}
             </span>
-
-            <button
-              onClick={scrollToTop}
-              className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#041006] border border-[#00ff66]/30 text-[#00ff66] hover:bg-[#00ff66] hover:text-black transition-colors"
-              title="Scroll to top"
-            >
-              <ArrowUp className="w-3.5 h-3.5" />
-              <span>TOP</span>
-            </button>
           </div>
+
         </div>
+
       </div>
     </footer>
   );

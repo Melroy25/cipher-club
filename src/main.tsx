@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext.tsx";
 import { PublicLayout } from "./components/PublicLayout.tsx";
+import { ScrollToTop } from "./components/ScrollToTop.tsx";
 import { HomePage } from "./pages/HomePage.tsx";
 import { TeamPage } from "./pages/TeamPage.tsx";
 import { EventsPage } from "./pages/EventsPage.tsx";
@@ -18,6 +19,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <ThemeProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           {/* Admin CMS Routes */}
           <Route path="/admin/*" element={<AdminApp />} />

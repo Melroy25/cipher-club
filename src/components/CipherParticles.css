@@ -1,0 +1,15 @@
+.cipher-particles {
+  display: block;
+
+  width: 100%;
+  height: clamp(190px, 22vw, 270px);
+
+  max-width: 1250px;
+
+  margin: 0 auto;
+
+  overflow: hidden;
+
+  pointer-events: auto;
+  cursor: default;
+}

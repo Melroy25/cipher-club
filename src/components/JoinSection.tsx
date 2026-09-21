@@ -35,7 +35,7 @@ export const JoinSection: React.FC<JoinSectionProps> = ({ onOpenJoinModal }) => 
   }, []);
 
   return (
-    <section id="join" className="relative py-28 md:py-36 overflow-hidden">
+    <section id="join" className="relative py-10 sm:py-14 md:py-16 overflow-hidden">
       <div className="max-w-4xl mx-auto px-6 md:px-12 text-center relative z-10">
         
         <div className="font-mono text-sm tracking-widest text-emerald-600 dark:text-[#00ff66] mb-3 font-bold">

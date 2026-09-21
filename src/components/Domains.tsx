@@ -75,7 +75,7 @@ export const Domains: React.FC = () => {
   }, []);
 
   return (
-    <section id="domains" className="relative py-24 md:py-32 overflow-hidden">
+    <section id="domains" className="relative py-8 sm:py-12 md:py-14 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         
         <div className="mb-12">

@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
 import { useScrambleText } from '../hooks/useScrambleText.ts';
 import { EventData, EventModal } from './EventModal.tsx';
@@ -108,7 +108,7 @@ export const Events: React.FC = () => {
   }, []);
 
   return (
-    <section id="events" className="relative py-28 md:py-36 overflow-hidden">
+    <section id="events" className="relative py-8 sm:py-12 md:py-14 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         
         <div className="mb-14">

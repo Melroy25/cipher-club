@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Save, Loader2, Plus, Trash2, Image as ImageIcon, Sparkles } from "lucide-react";
 import { useToast } from "../context/ToastContext.tsx";
 import { ImageUploader } from "../components/ImageUploader.tsx";
@@ -162,9 +162,9 @@ export const ContentPage: React.FC = () => {
     { id: "footer", label: "Footer & Socials" },
   ];
 
-  // Exclude raw about_photo_ keys from generic form since custom grid manages them
+  // Exclude raw about_photo_ and hero_stat_ keys from generic form since custom components manage them
   const currentSectionItems = items.filter(
-    (item) => item.section === activeTab && !item.key.startsWith("about_photo")
+    (item) => item.section === activeTab && !item.key.startsWith("about_photo") && !item.key.startsWith("hero_stat_")
   );
 
   return (
@@ -220,6 +220,68 @@ export const ContentPage: React.FC = () => {
           </div>
         ) : (
           <form onSubmit={handleSave} className="space-y-6 max-w-4xl">
+            {/* If on Hero Section, show the 4 Key Metrics HUD Editor */}
+            {activeTab === "hero" && (
+              <div className="p-5 rounded-2xl bg-[#020703] border border-[#00ff66]/25 space-y-4 mb-6">
+                <div className="border-b border-[#00ff66]/15 pb-3">
+                  <h3 className="font-mono text-sm font-bold text-white flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-[#00ff66]" />
+                    Hero Section — Key Metrics HUD (4 Cards)
+                  </h3>
+                  <p className="font-mono text-[11px] text-[#88aa90] mt-0.5">
+                    Configure the numbers and labels displayed in the cyber telemetry console on the right side of the hero section.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {[
+                    { id: 1, defaultNum: "500+", defaultLbl: "Active Members", defaultSub: "Dept. Community" },
+                    { id: 2, defaultNum: "25+", defaultLbl: "Sessions & Events", defaultSub: "Hands-on Workshops" },
+                    { id: 3, defaultNum: "04", defaultLbl: "Core Domains", defaultSub: "Tech & Leadership" },
+                    { id: 4, defaultNum: "100%", defaultLbl: "Student Driven", defaultSub: "Innovation & Growth" },
+                  ].map((stat) => (
+                    <div key={stat.id} className="p-4 rounded-xl bg-[#040e06] border border-[#00ff66]/20 space-y-3">
+                      <span className="font-mono text-[10px] text-[#00ff66] font-bold px-2 py-0.5 rounded bg-[#00ff66]/10 border border-[#00ff66]/20">
+                        Metric #{stat.id}
+                      </span>
+                      <div className="space-y-2.5">
+                        <div>
+                          <label className="font-mono text-[10px] text-[#88aa90] block mb-1">Number / Stat</label>
+                          <input
+                            type="text"
+                            value={contentValues[`hero_stat_${stat.id}_num`] ?? stat.defaultNum}
+                            onChange={(e) => handleChange(`hero_stat_${stat.id}_num`, e.target.value)}
+                            className="w-full bg-[#020703] border border-[#00ff66]/20 rounded-lg px-3 py-1.5 font-mono text-xs text-white focus:outline-none focus:border-[#00ff66]"
+                            placeholder={stat.defaultNum}
+                          />
+                        </div>
+                        <div>
+                          <label className="font-mono text-[10px] text-[#88aa90] block mb-1">Title / Label</label>
+                          <input
+                            type="text"
+                            value={contentValues[`hero_stat_${stat.id}_lbl`] ?? stat.defaultLbl}
+                            onChange={(e) => handleChange(`hero_stat_${stat.id}_lbl`, e.target.value)}
+                            className="w-full bg-[#020703] border border-[#00ff66]/20 rounded-lg px-3 py-1.5 font-mono text-xs text-white focus:outline-none focus:border-[#00ff66]"
+                            placeholder={stat.defaultLbl}
+                          />
+                        </div>
+                        <div>
+                          <label className="font-mono text-[10px] text-[#88aa90] block mb-1">Subtitle / Context</label>
+                          <input
+                            type="text"
+                            value={contentValues[`hero_stat_${stat.id}_sub`] ?? stat.defaultSub}
+                            onChange={(e) => handleChange(`hero_stat_${stat.id}_sub`, e.target.value)}
+                            className="w-full bg-[#020703] border border-[#00ff66]/20 rounded-lg px-3 py-1.5 font-mono text-xs text-white focus:outline-none focus:border-[#00ff66]"
+                            placeholder={stat.defaultSub}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* If on About Section, show the custom 8-Photo Showcase Manager */}
             {activeTab === "about" && (
               <div className="p-5 rounded-2xl bg-[#020703] border border-[#00ff66]/25 space-y-4 mb-6">

@@ -54,7 +54,7 @@ export const Leadership: React.FC = () => {
   const displayList = currentYearMembers.length > 0 ? currentYearMembers : members.slice(0, 5);
 
   return (
-    <section id="leadership" className="relative py-28 md:py-36 overflow-hidden">
+    <section id="leadership" className="relative py-8 sm:py-12 md:py-14 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         {/* ── Section Header with View Full Team button ───────────────────────── */}
         <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-6">

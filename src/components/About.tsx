@@ -136,7 +136,7 @@ export const About: React.FC = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} id="about" className="relative py-20 sm:py-28 md:py-36 overflow-hidden">
+    <section ref={sectionRef} id="about" className="relative py-8 sm:py-12 md:py-14 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-8 items-center">
           {/* Left Column: Narrative Content */}

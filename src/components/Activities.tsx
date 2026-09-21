@@ -82,7 +82,7 @@ export const Activities: React.FC = () => {
   }, []);
 
   return (
-    <section id="archive" className="relative py-28 md:py-36 overflow-hidden">
+    <section id="archive" className="relative py-8 sm:py-12 md:py-14 overflow-hidden">
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
         
         <div className="mb-12">

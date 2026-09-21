@@ -29,12 +29,14 @@ export const CipherParticleText: React.FC = () => {
     type Particle = {
       x: number;
       y: number;
-      homeX: number;
-      homeY: number;
+      originX: number;
+      originY: number;
       vx: number;
       vy: number;
       char: string;
       size: number;
+      baseAlpha: number;
+      colorVariation: "neon" | "emerald" | "cyber";
       brightness: number;
       phase: number;
     };
@@ -42,16 +44,18 @@ export const CipherParticleText: React.FC = () => {
     const particles: Particle[] = [];
 
     const mouse = {
-      x: -1000,
-      y: -1000,
-      previousX: -1000,
-      previousY: -1000,
+      x: -2000,
+      y: -2000,
+      prevX: -2000,
+      prevY: -2000,
+      vx: 0,
+      vy: 0,
       active: false,
-      lastMove: 0,
+      lastTime: 0,
     };
 
     const characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789<>/{}[]#$%&";
+      "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ<>{}[];:/=*+-_~#$";
 
     const randomChar = () =>
       characters[Math.floor(Math.random() * characters.length)];
@@ -79,14 +83,16 @@ export const CipherParticleText: React.FC = () => {
 
     const createParticles = () => {
       particles.length = 0;
-
       offCtx.clearRect(0, 0, width, height);
 
-      // Substantially larger font size proportioned to canvas
-      const maxFontSizeByHeight = height * 0.74;
-      const maxFontSizeByWidth = width / 7.2;
-      const fontSize = Math.min(maxFontSizeByHeight, maxFontSizeByWidth, 185);
+      // Desktop target: 800–850px total word width, 150–180px letter height
+      const desktopTargetWidth = 830;
+      const desktopTargetHeight = 165;
 
+      const availableWidth = Math.min(width - 32, desktopTargetWidth);
+      const scale = availableWidth / desktopTargetWidth;
+
+      const fontSize = Math.round(desktopTargetHeight * scale);
       offCtx.font = `900 ${fontSize}px monospace`;
       offCtx.textBaseline = "middle";
 
@@ -94,63 +100,57 @@ export const CipherParticleText: React.FC = () => {
       const letterWidths = letters.map(
         (letter) => offCtx.measureText(letter).width
       );
-      const sumWidths = letterWidths.reduce((sum, value) => sum + value, 0);
+      const sumWidths = letterWidths.reduce((sum, val) => sum + val, 0);
 
-      // Target total span: fill ~92% of the canvas width to match the red outline guide
-      const targetSpan = Math.min(width * 0.92, width - 40);
-      const minSpacing = fontSize * 0.15;
+      const targetWordWidth = Math.round(desktopTargetWidth * scale);
 
-      // Calculate letter spacing to distribute the letters across the intended horizontal area
-      const letterSpacing = Math.max(
-        minSpacing,
-        (targetSpan - sumWidths) / (letters.length - 1)
+      // Controlled gap between letters ensuring distinct separation without merging
+      const letterGap = Math.max(
+        Math.round(18 * scale),
+        (targetWordWidth - sumWidths) / (letters.length - 1)
       );
 
-      const totalWidth = sumWidths + letterSpacing * (letters.length - 1);
-      let currentX = (width - totalWidth) / 2;
+      const actualTotalWidth = sumWidths + letterGap * (letters.length - 1);
+      let currentX = (width - actualTotalWidth) / 2;
+      const centerY = height / 2;
 
       letters.forEach((letter, index) => {
         const letterWidth = letterWidths[index];
 
         offCtx.textAlign = "left";
         offCtx.fillStyle = "#ffffff";
+        offCtx.fillText(letter, currentX, centerY);
 
-        offCtx.fillText(
-          letter,
-          currentX,
-          height / 2
-        );
-
-        currentX += letterWidth + letterSpacing;
+        currentX += letterWidth + letterGap;
       });
 
       const image = offCtx.getImageData(0, 0, Math.round(width), Math.round(height));
       const data = image.data;
 
-      // Dense sampling intervals for fine, sandy matrix texture
-      const gap = Math.max(4, Math.min(6, Math.round(width / 190)));
+      // Fine sampling gap for dense sandy digital texture
+      const gap = Math.max(3, Math.min(4, Math.round(fontSize / 45)));
 
       for (let y = 0; y < height; y += gap) {
         for (let x = 0; x < width; x += gap) {
           const index = (Math.floor(y) * Math.round(width) + Math.floor(x)) * 4;
 
-          if (data[index + 3] > 100) {
+          if (data[index + 3] > 110) {
+            const rand = Math.random();
+            const colorVariation: "neon" | "emerald" | "cyber" =
+              rand > 0.55 ? "neon" : rand > 0.25 ? "emerald" : "cyber";
+
             particles.push({
               x,
               y,
-
-              homeX: x,
-              homeY: y,
-
+              originX: x,
+              originY: y,
               vx: 0,
               vy: 0,
-
               char: randomChar(),
-
-              size: Math.max(6, Math.min(9, fontSize * 0.05 + Math.random() * 1.5)),
-
-              brightness: 0.45 + Math.random() * 0.55,
-
+              size: Math.max(5.5, Math.min(7.8, fontSize * 0.042 + Math.random() * 1.2)),
+              baseAlpha: 0.55 + Math.random() * 0.45,
+              colorVariation,
+              brightness: 0.7 + Math.random() * 0.3,
               phase: Math.random() * Math.PI * 2,
             });
           }
@@ -160,95 +160,164 @@ export const CipherParticleText: React.FC = () => {
 
     const handleMouseMove = (event: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
+      const now = performance.now();
+      const currentX = event.clientX - rect.left;
+      const currentY = event.clientY - rect.top;
 
-      mouse.previousX = mouse.x;
-      mouse.previousY = mouse.y;
+      if (mouse.x > -1000) {
+        const dt = Math.max(8, Math.min(60, now - mouse.lastTime));
+        mouse.vx = ((currentX - mouse.x) / dt) * 16.6;
+        mouse.vy = ((currentY - mouse.y) / dt) * 16.6;
+        mouse.prevX = mouse.x;
+        mouse.prevY = mouse.y;
+      } else {
+        mouse.prevX = currentX;
+        mouse.prevY = currentY;
+      }
 
-      mouse.x = event.clientX - rect.left;
-      mouse.y = event.clientY - rect.top;
-
+      mouse.x = currentX;
+      mouse.y = currentY;
       mouse.active = true;
-      mouse.lastMove = performance.now();
+      mouse.lastTime = now;
     };
 
     const handleMouseLeave = () => {
       mouse.active = false;
+      mouse.x = -2000;
+      mouse.y = -2000;
+      mouse.vx = 0;
+      mouse.vy = 0;
     };
+
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const draw = (time: number) => {
       ctx.clearRect(0, 0, width, height);
-
       const isDark = themeRef.current === "dark";
 
-      // Sweeping sand brush radius scaled to text dimensions
-      const radius = Math.min(170, Math.max(120, width * 0.14));
+      // Interaction radius tuned to ~110px (within 90-130px specification)
+      const radius = 110;
 
-      particles.forEach((p) => {
-        const dx = p.x - mouse.x;
-        const dy = p.y - mouse.y;
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
 
-        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (!prefersReducedMotion && mouse.active) {
+          const dx = p.x - mouse.x;
+          const dy = p.y - mouse.y;
+          const dist = Math.hypot(dx, dy);
 
-        if (mouse.active && distance < radius) {
-          const force = Math.pow(1 - distance / radius, 1.5);
+          if (dist < radius && dist > 0) {
+            const factor = 1 - dist / radius;
+            const falloff = factor * factor;
 
-          const directionX = distance === 0 ? 1 : dx / distance;
-          const directionY = distance === 0 ? 0 : dy / distance;
+            // 1. Radial displacement away from the cursor
+            const radialPush = falloff * 2.6;
+            const dirX = dx / dist;
+            const dirY = dy / dist;
 
-          // Push particles away from cursor
-          p.vx += directionX * force * 2.2;
-          p.vy += directionY * force * 2.2;
+            p.vx += dirX * radialPush;
+            p.vy += dirY * radialPush;
 
-          // Sweeping momentum in cursor motion direction
-          const sweepX = mouse.x - mouse.previousX;
-          const sweepY = mouse.y - mouse.previousY;
+            // 2. Sweeping broom force aligned with cursor movement
+            const speed = Math.hypot(mouse.vx, mouse.vy);
+            const sweepStrength = Math.min(speed, 24) * 0.055;
+            p.vx += mouse.vx * falloff * sweepStrength;
+            p.vy += mouse.vy * falloff * sweepStrength;
 
-          p.vx += sweepX * force * 0.045;
-          p.vy += sweepY * force * 0.045;
+            // 3. Subtle organic sand grain micro-dispersion
+            const grainNoise =
+              (Math.sin(p.originX * 91.3 + p.originY * 37.7) - 0.5) * 0.5;
+            p.vx += grainNoise * falloff;
+            p.vy += grainNoise * falloff;
+          }
         }
 
-        // Return particles to their original letter positions
-        const homeDX = p.homeX - p.x;
-        const homeDY = p.homeY - p.y;
+        // Return force to home target position
+        const homeDX = p.originX - p.x;
+        const homeDY = p.originY - p.y;
+        const displacement = Math.hypot(homeDX, homeDY);
 
-        p.vx += homeDX * 0.02;
-        p.vy += homeDY * 0.02;
+        // Limit maximum displacement to ~85-95px (within 50-100px requirement)
+        if (displacement > 90) {
+          const excess = (displacement - 90) * 0.09;
+          p.vx += (homeDX / displacement) * excess;
+          p.vy += (homeDY / displacement) * excess;
+        }
 
-        // Friction creates soft, grainy movement
-        p.vx *= 0.90;
-        p.vy *= 0.90;
+        p.vx += homeDX * 0.022;
+        p.vy += homeDY * 0.022;
+
+        // Friction damping creates soft, fluid sand motion without bouncing
+        p.vx *= 0.88;
+        p.vy *= 0.88;
 
         p.x += p.vx;
         p.y += p.vy;
 
-        const displaced = Math.hypot(homeDX, homeDY);
-        const glow = 0.5 + Math.sin(time * 0.0015 + p.phase) * 0.15;
-        const alpha = Math.min(1, 0.55 + glow * 0.35 + displaced * 0.002);
+        // Snap precisely once settled to eliminate idle micro-jitter
+        if (
+          Math.abs(p.vx) < 0.01 &&
+          Math.abs(p.vy) < 0.01 &&
+          displacement < 0.25
+        ) {
+          p.x = p.originX;
+          p.y = p.originY;
+          p.vx = 0;
+          p.vy = 0;
+        }
 
-        ctx.globalAlpha = alpha * p.brightness;
+        // Luminous shimmer and disturbance glow
+        const shimmer = Math.sin(time * 0.0018 + p.phase) * 0.12;
+        const isDisplaced = displacement > 2.5;
+
+        let alpha = Math.min(1, p.baseAlpha * p.brightness + shimmer);
+        if (isDisplaced) {
+          alpha = Math.min(1, alpha + 0.25);
+        }
+
+        ctx.globalAlpha = alpha;
         ctx.font = `${p.size}px monospace`;
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
         if (isDark) {
-          ctx.fillStyle = "#00ff88";
-          ctx.shadowColor = "#00ff66";
-          ctx.shadowBlur = displaced > 3 ? 5 : 3;
+          if (p.colorVariation === "neon") {
+            ctx.fillStyle = "#00ff88";
+            ctx.shadowColor = "#00ff66";
+          } else if (p.colorVariation === "emerald") {
+            ctx.fillStyle = "#10b981";
+            ctx.shadowColor = "#10b981";
+          } else {
+            ctx.fillStyle = "#34d399";
+            ctx.shadowColor = "#00ff66";
+          }
+          ctx.shadowBlur = isDisplaced ? 7 : p.brightness > 0.82 ? 4 : 2;
         } else {
-          ctx.fillStyle = "#059669";
-          ctx.shadowColor = "#059669";
-          ctx.shadowBlur = displaced > 3 ? 4 : 2;
+          if (p.colorVariation === "neon") {
+            ctx.fillStyle = "#059669";
+            ctx.shadowColor = "#059669";
+          } else if (p.colorVariation === "emerald") {
+            ctx.fillStyle = "#047857";
+            ctx.shadowColor = "#047857";
+          } else {
+            ctx.fillStyle = "#0f766e";
+            ctx.shadowColor = "#0f766e";
+          }
+          ctx.shadowBlur = isDisplaced ? 5 : 2;
         }
 
         ctx.fillText(p.char, p.x, p.y);
-      });
+      }
 
       ctx.globalAlpha = 1;
       ctx.shadowBlur = 0;
 
-      if (performance.now() - mouse.lastMove > 100) {
-        mouse.previousX = mouse.x;
-        mouse.previousY = mouse.y;
+      // Decay stale cursor velocity
+      if (performance.now() - mouse.lastTime > 90) {
+        mouse.vx *= 0.6;
+        mouse.vy *= 0.6;
       }
 
       animationFrame = requestAnimationFrame(draw);
@@ -261,15 +330,12 @@ export const CipherParticleText: React.FC = () => {
     resizeObserver.observe(canvas);
 
     resize();
-
     animationFrame = requestAnimationFrame(draw);
 
     return () => {
       cancelAnimationFrame(animationFrame);
-
       canvas.removeEventListener("mousemove", handleMouseMove);
       canvas.removeEventListener("mouseleave", handleMouseLeave);
-
       resizeObserver.disconnect();
     };
   }, []);

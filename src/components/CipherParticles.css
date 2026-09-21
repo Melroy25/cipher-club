@@ -2,11 +2,11 @@
   display: block;
 
   width: 100%;
-  height: clamp(190px, 22vw, 270px);
+  height: clamp(190px, 24vw, 240px);
 
-  max-width: 1250px;
+  max-width: 980px;
 
-  margin: 0 auto;
+  margin: 0 auto 1rem auto;
 
   overflow: hidden;
 

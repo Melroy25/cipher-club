@@ -85,13 +85,12 @@ export const CipherParticleText: React.FC = () => {
       particles.length = 0;
       offCtx.clearRect(0, 0, width, height);
 
-      // Desktop target: heavy, thick, large letters ~165-175px height
-      const targetHeight = Math.min(height * 0.76, 175);
+      // Desktop target: noticeably bigger letters ~195-215px height to fill red outline
+      const targetHeight = Math.min(height * 0.82, 215);
       // Ensure on narrow screens it scales down proportionally
-      const maxPossibleWidth = width - 32;
-      // At fontSize ~ 170px, total width with close spacing in Arial Black is ~750px
-      const scale = Math.min(1, maxPossibleWidth / 750);
-      const fontSize = Math.max(48, Math.round(targetHeight * scale));
+      const maxPossibleWidth = width - 36;
+      const scale = Math.min(1, maxPossibleWidth / 880);
+      const fontSize = Math.max(54, Math.round(targetHeight * scale));
 
       // Ultra-heavy, bold headline font so letter strokes are thick, fat, and chunky
       offCtx.font = `900 ${fontSize}px "Arial Black", Impact, "Segoe UI Black", "Inter", sans-serif`;
@@ -104,7 +103,7 @@ export const CipherParticleText: React.FC = () => {
       const sumWidths = letterWidths.reduce((sum, val) => sum + val, 0);
 
       // Close, tight spacing between letters as shown in reference pic (media_1790010540024.png)
-      const letterGap = Math.max(8, Math.round(fontSize * 0.11));
+      const letterGap = Math.max(9, Math.round(fontSize * 0.105));
 
       const actualTotalWidth = sumWidths + letterGap * (letters.length - 1);
       let currentX = (width - actualTotalWidth) / 2;
@@ -214,46 +213,46 @@ export const CipherParticleText: React.FC = () => {
             const factor = 1 - dist / radius;
             const falloff = factor * factor;
 
-            // 1. Radial displacement away from the cursor
-            const radialPush = falloff * 2.6;
+            // 1. Softer, slower radial push away from the cursor
+            const radialPush = falloff * 1.5;
             const dirX = dx / dist;
             const dirY = dy / dist;
 
             p.vx += dirX * radialPush;
             p.vy += dirY * radialPush;
 
-            // 2. Sweeping broom force aligned with cursor movement
+            // 2. Gentle sweeping broom force aligned with cursor movement
             const speed = Math.hypot(mouse.vx, mouse.vy);
-            const sweepStrength = Math.min(speed, 24) * 0.055;
+            const sweepStrength = Math.min(speed, 20) * 0.035;
             p.vx += mouse.vx * falloff * sweepStrength;
             p.vy += mouse.vy * falloff * sweepStrength;
 
             // 3. Subtle organic sand grain micro-dispersion
             const grainNoise =
-              (Math.sin(p.originX * 91.3 + p.originY * 37.7) - 0.5) * 0.5;
+              (Math.sin(p.originX * 91.3 + p.originY * 37.7) - 0.5) * 0.35;
             p.vx += grainNoise * falloff;
             p.vy += grainNoise * falloff;
           }
         }
 
-        // Return force to home target position
+        // Return force to home target position (gentler, slower return)
         const homeDX = p.originX - p.x;
         const homeDY = p.originY - p.y;
         const displacement = Math.hypot(homeDX, homeDY);
 
-        // Limit maximum displacement to ~85-95px (within 50-100px requirement)
-        if (displacement > 90) {
-          const excess = (displacement - 90) * 0.09;
+        // Limit maximum displacement gently
+        if (displacement > 95) {
+          const excess = (displacement - 95) * 0.07;
           p.vx += (homeDX / displacement) * excess;
           p.vy += (homeDY / displacement) * excess;
         }
 
-        p.vx += homeDX * 0.022;
-        p.vy += homeDY * 0.022;
+        p.vx += homeDX * 0.015;
+        p.vy += homeDY * 0.015;
 
-        // Friction damping creates soft, fluid sand motion without bouncing
-        p.vx *= 0.88;
-        p.vy *= 0.88;
+        // Friction damping creates soft, fluid sand motion with slightly slower reaction
+        p.vx *= 0.92;
+        p.vy *= 0.92;
 
         p.x += p.vx;
         p.y += p.vy;
